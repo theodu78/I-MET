@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>I MET - Calendar</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+</head>
+<body>
+    <div id="calendar"></div>
+
+    <!-- Modal Popup -->
+    <div id="modalPopup" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fermerModal()">&times;</span>
+            <form id="presenceForm">
+                <label for="dateDebut">J'arriverai le:</label>
+                <input type="date" id="dateDebut" name="dateDebut"><br><br>
+
+                <label for="repasDebut">Pour:</label>
+                <select id="repasDebut" name="repasDebut">
+                    <option value="dejeuner">le déjeuner</option>
+                    <option value="diner">le dîner</option>
+                    <option value="nuit">la nuit</option>
+                </select><br><br>
+
+                <label for="dateFin">Je repartirai le:</label>
+                <input type="date" id="dateFin" name="dateFin"><br><br>
+
+                <label for="repasFin">Après:</label>
+                <select id="repasFin" name="repasFin">
+                    <option value="petit-dejeuner">le petit-déjeuner</option>
+                    <option value="dejeuner">le déjeuner</option>
+                    <option value="diner">le dîner</option>
+                </select><br><br>
+
+                <input type="button" value="Valider" onclick="sauvegarderPresence()">
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
