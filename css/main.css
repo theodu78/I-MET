@@ -43,3 +43,25 @@ body {
     text-decoration: none;
     cursor: pointer;
 }
+.selected-event {
+    border: 2px solid rgb(0, 110, 255); /* Exemple de style */
+    background-color: lightblue;
+}
+
+.evenement-selectionne {
+    background-color: #add8e6; /* Choisissez une couleur de surlignage */
+    color: white;
+}
+#arbreGenealogique {
+    display: flex;
+    flex-direction: column;
+}
+
+.generation {
+    margin-bottom: 20px;
+}
+
+.membre {
+    display: block;
+    margin: 5px 0;
+}
