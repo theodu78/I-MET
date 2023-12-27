@@ -171,4 +171,7 @@ function fermerModal() {
     document.getElementById('modalPopup').style.display = 'none';
     var dateDebut = document.getElementById('dateDebut').value;
     console.log(dateDebut)
+
+    // envoyer a firebase 
+
 }
