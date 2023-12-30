@@ -1,4 +1,25 @@
-var calendar;
+// Importation des modules Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// Configuration Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCcrsekQLQFxfz_a2Ti4FaT6zj74kkF8aE",
+    authDomain: "i-met-f007d.firebaseapp.com",
+    projectId: "i-met-f007d",
+    storageBucket: "i-met-f007d.appspot.com",
+    messagingSenderId: "222760135412",
+    appId: "1:222760135412:web:109b02e73fa819b1a44ca1",
+    measurementId: "G-XDJF1R2HDJ"
+};
+
+// Initialisation de l'application Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Initialisation du calendrier
+let calendar;
+let selectedDate = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
 
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
@@ -6,122 +27,208 @@ document.addEventListener('DOMContentLoaded', function() {
         initialView: 'dayGridMonth',
         locale: 'fr',
         firstDay: 1,
-        displayEventTime: false, // Ajoutez cette ligne pour ne pas afficher l'heure
-        events: recupererPresences(),
+        displayEventTime: false,
+        events: fetchEvents,
         dateClick: function(info) {
-            ouvrirModal(info.dateStr);
+            selectedDate = info.dateStr; // Mise à jour de selectedDate à chaque clic sur une date
+            if (calendar.view.type === 'dayGridMonth') {
+                calendar.changeView('timeGridDay', selectedDate);
+                document.getElementById('retourMois').style.display = 'block';
+            }
         },
+
         eventClick: function(info) {
-            chargerEvenementPourModification(info.event);
+            const eventId = info.event.id;
+            const eventRef = doc(db, "Events", eventId);
+
+            getDoc(eventRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                    chargerEvenementPourModification(info.event);
+                } else {
+                    alert("Cet événement a été supprimé.");
+                    calendar.refetchEvents();
+                }
+            });
         }
     });
+
     calendar.render();
+    chargerListeParticipants();
+
+    document.getElementById('retourMois').addEventListener('click', function() {
+        calendar.changeView('dayGridMonth');
+        this.style.display = 'none';
+        selectedDate = new Date().toISOString().split('T')[0]; // Réinitialiser selectedDate à la date d'aujourd'hui
+    });
+    
+    document.getElementById('declarerSejour').addEventListener('click', function() {
+        ouvrirModal(); // Utilise la date sélectionnée;
+    });
 });
 
+// Fonction pour récupérer les noms des participants à partir des ID
+async function getParticipantNames(participantIds) {
+    const usersCol = collection(db, 'Users');
+    const userSnapshots = await Promise.all(
+        participantIds.map(id => getDoc(doc(usersCol, id)))
+    );
 
-function recupererPresences() {
-    var presences = sessionStorage.getItem('presences');
-    return presences ? JSON.parse(presences) : [];
+    // Ajouter console.log ici pour déboguer
+    userSnapshots.forEach(snapshot => console.log(snapshot.data()));
+
+    return userSnapshots.map(snapshot => snapshot.data()?.Name || 'Inconnu');
 }
 
-function ouvrirModal(dateISO, eventId) {
-    var dateFormatee = formaterDatePourAffichage(dateISO);
-    document.getElementById('dateDebut').value = dateFormatee;
-    document.getElementById('dateFin').value = dateFormatee;
-    document.getElementById('presenceForm').dataset.eventId = eventId || '';
+// Fonction pour récupérer les événements
+async function fetchEvents(fetchInfo, successCallback, failureCallback) {
+    try {
+        const eventsCol = collection(db, 'Events');
+        const eventSnapshot = await getDocs(eventsCol);
+        const events = await Promise.all(eventSnapshot.docs.map(async (doc) => {
+            const data = doc.data();
+            const participantNames = await getParticipantNames(data.participants || []);
+            return {
+                id: doc.id,
+                title: participantNames.join(' / '), // Affiche les noms séparés par ' / '
+                start: data.dateDebut,
+                end: data.dateFin,
+                allDay: false
+            };
+        }));
+        successCallback(events);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des événements:", error);
+        failureCallback(error);
+    }
+}
 
-    var selectedDate = new Date(dateISO).toISOString().split('T')[0];
-    var evenementsDuJour = calendar.getEvents().filter(function(ev) {
-        var startDate = new Date(ev.start).toISOString().split('T')[0];
-        var endDate = ev.end ? new Date(ev.end).toISOString().split('T')[0] : startDate;
-        return startDate === selectedDate || (startDate <= selectedDate && endDate >= selectedDate);
-    });
 
-    var listeEvenements = document.getElementById('listeEvenements');
-    listeEvenements.innerHTML = '';
-
-    evenementsDuJour.forEach(function(ev) {
-        var btn = document.createElement('button');
-        btn.innerText = ev.title;
-        btn.onclick = function() { 
-            highlightSelectedEvent(btn, evenementsDuJour);
-            chargerEvenementPourModification(ev);
-        };
-        listeEvenements.appendChild(btn);
-
-        if (eventId && ev.id === eventId) {
-            btn.classList.add('evenement-selectionne');
-        }
-    });
-
+// Fonctions pour gérer les modalités
+function ouvrirModal() {
+    document.getElementById('dateDebut').value = convertirDatePourAffichage(selectedDate);
+    document.getElementById('dateFin').value = convertirDatePourAffichage(selectedDate);
     document.getElementById('modalPopup').style.display = 'block';
+    chargerListeParticipants();
 }
 
-function highlightSelectedEvent(selectedButton, allEvents) {
-    allEvents.forEach(function(ev) {
-        var buttons = document.querySelectorAll('#listeEvenements button');
-        buttons.forEach(function(btn) {
-            btn.classList.remove('evenement-selectionne');
-        });
-    });
-    selectedButton.classList.add('evenement-selectionne');
-}
-
+// Fonction pour charger un événement pour modification
 function chargerEvenementPourModification(event) {
-    document.getElementById('dateDebut').value = formaterDatePourAffichage(event.start.toISOString());
-    document.getElementById('dateFin').value = event.end ? formaterDatePourAffichage(event.end.toISOString()) : formaterDatePourAffichage(event.start.toISOString());
+    document.getElementById('dateDebut').value = convertirDatePourAffichage(event.start.toISOString());
+    document.getElementById('dateFin').value = event.end ? convertirDatePourAffichage(event.end.toISOString()) : convertirDatePourAffichage(event.start.toISOString());
     document.getElementById('presenceForm').dataset.eventId = event.id;
-
-    document.getElementById('btnSupprimer').style.display = 'block';
     document.getElementById('modalPopup').style.display = 'block';
+    chargerListeParticipants(); // Chargement des participants à chaque modification
+    document.getElementById('btnSupprimer').style.display = 'block'; // Affichage du bouton Supprimer
 }
 
-function sauvegarderPresence() {
+// Fonctions pour gérer les événements Firebase
+window.sauvegarderPresence = async function() {
     var eventId = document.getElementById('presenceForm').dataset.eventId;
-    var dateDebut = convertirDateEnISO(document.getElementById('dateDebut').value);
-    var dateFin = convertirDateEnISO(document.getElementById('dateFin').value);
-    var repasDebut = document.getElementById('repasDebut').value;
-    var repasFin = document.getElementById('repasFin').value;
-    var heureDebut = getHeureDebut(repasDebut);
-    var heureFin = getHeureFin(repasFin);
-    var title = `${getEmoji(repasDebut)} - NOM`;
+    console.log('Repas début:', document.getElementById('repasDebut').value);
+    console.log('Repas fin:', document.getElementById('repasFin').value);
+    console.log('Heure début pour déjeuner:', getHeureDebut('dejeuner'));
+    console.log('Heure fin pour dîner:', getHeureFin('diner'));
+    var dateDebut = convertirDateEnISO(document.getElementById('dateDebut').value) + 'T' + getHeureDebut(document.getElementById('repasDebut').value);
+    var dateFin = convertirDateEnISO(document.getElementById('dateFin').value) + 'T' + getHeureFin(document.getElementById('repasFin').value);
+    var participants = Array.from(document.querySelectorAll('#participantCheckboxes input[type=checkbox]:checked')).map(cb => cb.value);
 
-    if (eventId) {
-        var event = calendar.getEventById(eventId);
-        if (event) {
-            event.setDates(dateDebut + 'T' + heureDebut, dateFin + 'T' + heureFin);
-            event.setProp('title', title);
+    var eventData = {
+        dateDebut,
+        dateFin,
+        participants,
+        nombreParticipants: participants.length
+    };
+
+    try {
+        console.log('Event ID:', eventId);
+        if (eventId) {
+            // Mise à jour de l'événement existant
+            const eventRef = doc(db, "Events", eventId);
+            console.log('Enregistrement de l\'événement:', eventData);
+            await updateDoc(eventRef, eventData);
+        } else {
+            // Création d'un nouvel événement
+            await addDoc(collection(db, 'Events'), eventData);
         }
-    } else {
-        var nouvelEvenement = {
-            id: Date.now().toString(), 
-            title: title,
-            start: dateDebut + 'T' + heureDebut,
-            end: dateFin + 'T' + heureFin,
-            allDay: false
-        };
-        calendar.addEvent(nouvelEvenement);
+        calendar.refetchEvents();
+        fermerModal();
+    } catch (error) {
+        console.error("Erreur lors de la sauvegarde de l'événement: ", error);
     }
+};
 
-    sessionStorage.setItem('presences', JSON.stringify(calendar.getEvents()));
-    fermerModal();
-}
-
-function supprimerEvenement() {
+window.supprimerEvenement = async function() {
     var eventId = document.getElementById('presenceForm').dataset.eventId;
     if (eventId) {
-        var event = calendar.getEventById(eventId);
-        if (event) {
-            event.remove();
-        }
-        sessionStorage.setItem('presences', JSON.stringify(calendar.getEvents()));
-    }
+        try {
+            const eventRef = doc(db, "Events", eventId);
+            await deleteDoc(eventRef);
+            calendar.refetchEvents();
+            fermerModal();
 
-    document.getElementById('presenceForm').dataset.eventId = '';
-    fermerModal();
+            // Réinitialiser eventId
+            document.getElementById('presenceForm').dataset.eventId = '';
+        } catch (error) {
+            console.error("Erreur lors de la suppression de l'événement: ", error);
+        }
+    }
+};
+
+window.fermerModal = function() {
+    var modal = document.getElementById('modalPopup');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+
+// Fonction pour charger la liste des participants
+async function chargerListeParticipants() {
+    try {
+        const usersCol = collection(db, 'Users');
+        const userSnapshot = await getDocs(usersCol);
+        const userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(user => user.actif);
+        console.log('Utilisateurs chargés:', userList);
+        const checkboxesContainer = document.getElementById('participantCheckboxes');
+        checkboxesContainer.innerHTML = ''; // Nettoyer les cases à cocher précédentes
+
+        userList.forEach((user, index) => {
+            let checkboxId = `participant-${index}`;
+        
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = checkboxId;
+            checkbox.value = user.id; // Utilisez l'ID unique comme valeur
+
+            let label = document.createElement('label');
+            label.htmlFor = checkboxId;
+            label.textContent = user.Name; // Nom pour l'affichage
+
+            checkboxesContainer.appendChild(checkbox);
+            checkboxesContainer.appendChild(label);
+        });
+    } catch (error) {
+        console.error("Erreur lors du chargement des utilisateurs: ", error);
+    }
 }
 
-function formaterDatePourAffichage(dateISO) {
+
+window.ouvrirChoixParticipants = function() {
+    document.getElementById('choixParticipants').style.display = 'block';
+    chargerListeParticipants();
+};
+
+function fermerChoixParticipants() {
+    document.getElementById('choixParticipants').style.display = 'none';
+}
+
+window.validerSelectionParticipants = function() {
+    // Votre logique pour récupérer et stocker les participants sélectionnés
+    fermerChoixParticipants();
+};
+
+
+// Fonctions de conversion de date
+function convertirDatePourAffichage(dateISO) {
     var date = new Date(dateISO);
     var jour = ('0' + date.getDate()).slice(-2);
     var mois = ('0' + (date.getMonth() + 1)).slice(-2);
@@ -134,44 +241,45 @@ function convertirDateEnISO(dateDDMMYYYY) {
     return `${parties[2]}-${parties[1]}-${parties[0]}`;
 }
 
+// Fonctions pour obtenir les heures de début et de fin
 function getHeureDebut(repas) {
-    if (repas === 'dejeuner') {
-        return '12:00:00';
-    } else if (repas === 'diner') {
-        return '18:00:00';
-    } else if (repas === 'nuit') {
-        return '21:00:00';
+    switch (repas) {
+        case 'dejeuner':
+            return '12:00:00';
+        case 'diner':
+            return '18:00:00';
+        case 'nuit':
+            return '21:00:00';
+        default:
+            return '00:00:00';
     }
-    return '00:00:00';
 }
 
 function getHeureFin(repas) {
-    if (repas === 'petit-dejeuner') {
-        return '09:00:00';
-    } else if (repas === 'dejeuner') {
-        return '14:00:00';
-    } else if (repas === 'diner') {
-        return '22:00:00';
+    switch (repas) {
+        case 'petit-dejeuner':
+            return '09:00:00';
+        case 'dejeuner':
+            return '14:00:00';
+        case 'diner':
+            return '22:00:00';
+        default:
+            return '23:59:59';
     }
-    return '23:59:59';
 }
 
+// Fonction pour obtenir un emoji basé sur le repas
 function getEmoji(repas) {
-    if (repas === 'dejeuner') {
-        return '🥗';
-    } else if (repas === 'diner') {
-        return '🍲';
-    } else if (repas === 'nuit') {
-        return '🌙';
+    switch (repas) {
+        case 'dejeuner':
+            return '🥗';
+        case 'diner':
+            return '🍲';
+        case 'nuit':
+            return '🌙';
+        case 'petit-dejeuner':
+            return '☕';
+        default:
+            return '';
     }
-    return '';
-}
-
-function fermerModal() {
-    document.getElementById('modalPopup').style.display = 'none';
-    var dateDebut = document.getElementById('dateDebut').value;
-    console.log(dateDebut)
-
-    // envoyer a firebase 
-
 }

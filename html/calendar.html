@@ -6,12 +6,14 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 </head>
 <body>
+    <button id="retourMois" style="display: none;">&lt; Vue Mois</button>
     <div id="calendar"></div>
+    <button id="declarerSejour">Déclarer un Séjour</button>
 
     <!-- Modal Popup -->
     <div id="modalPopup" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="close" onclick="fermerModal()">&times;</span>
+            <span class="close" onclick="window.fermerModal()">&times;</span>
             <form id="presenceForm">
                 <label for="dateDebut">J'arriverai le:</label>
                 <input type="text" id="dateDebut" name="dateDebut"><br><br>
@@ -32,14 +34,28 @@
                     <option value="dejeuner">le déjeuner</option>
                     <option value="diner">le dîner</option>
                 </select><br><br>
+
+                <label for="participants">Participants:</label>
                 
-                <button type="button" onclick="sauvegarderPresence()">Valider</button>
-                <button type="button" id="btnSupprimer" style="display:none;" onclick="supprimerEvenement()">Supprimer</button>
+
+                <button type="button" id="btnAjouterParticipants" onclick="ouvrirChoixParticipants()">Ajouter participants</button>
+                <button type="button" onclick="window.sauvegarderPresence()">Valider</button>
+                <button type="button" id="btnSupprimer" style="display:none;" onclick="window.supprimerEvenement()">Supprimer</button>
             </form>
             <div id="listeEvenements"></div>
         </div>
     </div>
 
-    <script src="../js/main.js"></script>
+    <div id="choixParticipants" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="fermerChoixParticipants()">&times;</span>
+            <div id="participantCheckboxes">
+                <!-- Les cases à cocher seront ajoutées dynamiquement ici -->
+            </div>
+            <button type="button" onclick="validerSelectionParticipants()">Sélectionner</button>
+        </div>
+    </div>
+
+    <script type="module" src="../js/main.js"></script>
 </body>
 </html>
