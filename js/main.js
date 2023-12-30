@@ -60,9 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.display = 'none';
         selectedDate = new Date().toISOString().split('T')[0]; // Réinitialiser selectedDate à la date d'aujourd'hui
     });
-    
+
     document.getElementById('declarerSejour').addEventListener('click', function() {
-        ouvrirModal(); // Utilise la date sélectionnée;
+        ouvrirModal(true); // Ouvrir le modal pour un nouvel événement
     });
 });
 
@@ -104,7 +104,10 @@ async function fetchEvents(fetchInfo, successCallback, failureCallback) {
 
 
 // Fonctions pour gérer les modalités
-function ouvrirModal() {
+function ouvrirModal(nouvelEvenement = false) {
+    if (nouvelEvenement) {
+        document.getElementById('presenceForm').dataset.eventId = ''; // Réinitialiser eventId pour un nouvel événement
+    }
     document.getElementById('dateDebut').value = convertirDatePourAffichage(selectedDate);
     document.getElementById('dateFin').value = convertirDatePourAffichage(selectedDate);
     document.getElementById('modalPopup').style.display = 'block';
