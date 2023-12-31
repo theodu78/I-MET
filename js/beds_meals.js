@@ -157,15 +157,19 @@ function calculateNightsForDate(dateString, events) {
     events.forEach(event => {
         const startDate = new Date(event.dateDebut);
         const endDate = new Date(event.dateFin);
+        // La date de début doit être ajustée pour inclure uniquement la journée, sans l'heure
+        startDate.setHours(0, 0, 0, 0);
 
-        // Comptabiliser une nuit si la date spécifiée est comprise entre la date de début et la date de fin de l'événement
-        if (specifiedDate >= startDate && specifiedDate < endDate) {
+        // Comptabiliser une nuit si la date spécifiée est la même que la date de début de l'événement
+        // La logique a été changée pour comparer uniquement les dates sans tenir compte des heures
+        if (specifiedDate.getTime() === startDate.getTime()) {
             totalNights += event.nombreParticipants;
         }
     });
 
     return totalNights;
 }
+
 
 function calculateMealsForDate(dateString, events, mealType) {
     const specifiedDate = new Date(dateString);
@@ -176,15 +180,26 @@ function calculateMealsForDate(dateString, events, mealType) {
         const startDate = new Date(event.dateDebut);
         const endDate = new Date(event.dateFin);
 
-        // Comptabiliser un repas si la date spécifiée est comprise entre la date de début et la date de fin de l'événement
-        // et si le type de repas correspond
-        if (specifiedDate >= startDate && specifiedDate < endDate && event.typeRepas === mealType) {
+        // Déterminer si l'événement inclut un déjeuner ou un dîner pour cette date
+        if (includesMeal(startDate, endDate, specifiedDate, mealType)) {
             totalMeals += event.nombreParticipants;
         }
     });
 
     return totalMeals;
 }
+
+// Fonction auxiliaire pour vérifier si un événement inclut un repas spécifique pour une date donnée
+function includesMeal(startDate, endDate, dayDate, mealType) {
+    const startHour = (mealType === 'dejeuner') ? 12 : 18;
+    const endHour = (mealType === 'dejeuner') ? 14 : 22;
+
+    const mealStartTime = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), startHour);
+    const mealEndTime = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate(), endHour);
+
+    return (startDate < mealEndTime && endDate > mealStartTime);
+}
+
 
 // Gestionnaires d'événements pour les boutons de navigation des semaines
 document.getElementById('prevWeek').addEventListener('click', () => {
