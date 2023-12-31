@@ -63,14 +63,14 @@ function createBedsTableHalf(bedsTable, events, startDay, endDay, includeHeader)
     const nightsRow = document.createElement('tr');
 
     if (includeHeader) {
-        daysRow.appendChild(createHeaderCell("Jours"));
-        nightsRow.appendChild(createHeaderCell("Couchages"));
+        daysRow.appendChild(createHeaderCell("Jours", '1'));
+        nightsRow.appendChild(createHeaderCell("Couchages", '1'));
     }
 
     for (let i = startDay; i < endDay; i++) {
         const dayDate = new Date(currentWeekStart);
         dayDate.setDate(dayDate.getDate() + i);
-        daysRow.appendChild(createDayCell(dayDate));
+        daysRow.appendChild(createDayCell(dayDate, '1'));
         nightsRow.appendChild(createNightCell(dayDate, events));
     }
 
@@ -78,28 +78,77 @@ function createBedsTableHalf(bedsTable, events, startDay, endDay, includeHeader)
     bedsTable.appendChild(nightsRow);
 }
 
-// Crée une cellule d'en-tête pour les tableaux
-function createHeaderCell(text) {
+// Met à jour le tableau des repas
+function updateMealsTable(events) {
+    const mealsTable = document.getElementById('mealsTable');
+    mealsTable.innerHTML = '';
+    createMealsTableHalf(mealsTable, events, 0, 4, true); // Première moitié avec en-tête
+    mealsTable.appendChild(document.createElement('br'));
+    createMealsTableHalf(mealsTable, events, 4, 9, false); // Deuxième moitié sans en-tête
+}
+
+// Crée une moitié du tableau des repas
+function createMealsTableHalf(mealsTable, events, startDay, endDay, includeHeader) {
+    const daysRow = document.createElement('tr');
+    const mealTypesRow = document.createElement('tr');
+    const mealsCountRow = document.createElement('tr');
+
+    if (includeHeader) {
+        daysRow.appendChild(createHeaderCell("Jours", '2'));
+        mealTypesRow.appendChild(createHeaderCell("Repas", '2'));
+        mealsCountRow.appendChild(createHeaderCell("Convives", '2'));
+    }
+
+    for (let i = startDay; i < endDay; i++) {
+        const dayDate = new Date(currentWeekStart);
+        dayDate.setDate(dayDate.getDate() + i);
+        daysRow.appendChild(createDayCell(dayDate, '2'));
+
+        mealTypesRow.appendChild(createMealTypeCell('Déjeuner'));
+        mealTypesRow.appendChild(createMealTypeCell('Dîner'));
+
+        mealsCountRow.appendChild(createMealsCountCell(dayDate, events, 'dejeuner'));
+        mealsCountRow.appendChild(createMealsCountCell(dayDate, events, 'diner'));
+    }
+
+    mealsTable.appendChild(daysRow);
+    mealsTable.appendChild(mealTypesRow);
+    mealsTable.appendChild(mealsCountRow);
+}
+
+// Fonctions auxiliaires pour créer les cellules
+function createHeaderCell(text, colspan) {
     const cell = document.createElement('th');
     cell.textContent = text;
+    cell.setAttribute('colspan', colspan);
     return cell;
 }
 
-// Crée une cellule pour la date du jour
-function createDayCell(date) {
+function createDayCell(date, colspan) {
     const cell = document.createElement('td');
     cell.textContent = formatDate(date);
+    cell.setAttribute('colspan', colspan);
     return cell;
 }
 
-// Crée une cellule pour le nombre total de couchages
 function createNightCell(date, events) {
     const cell = document.createElement('td');
     cell.textContent = calculateNightsForDate(date.toISOString().split('T')[0], events);
     return cell;
 }
 
-// Calcule le nombre total de nuits pour une date donnée
+function createMealTypeCell(mealType) {
+    const cell = document.createElement('td');
+    cell.textContent = mealType;
+    return cell;
+}
+
+function createMealsCountCell(date, events, mealType) {
+    const cell = document.createElement('td');
+    cell.textContent = calculateMealsForDate(date.toISOString().split('T')[0], events, mealType);
+    return cell;
+}
+
 function calculateNightsForDate(dateString, events) {
     const specifiedDate = new Date(dateString);
     specifiedDate.setHours(0, 0, 0, 0);
@@ -109,6 +158,7 @@ function calculateNightsForDate(dateString, events) {
         const startDate = new Date(event.dateDebut);
         const endDate = new Date(event.dateFin);
 
+        // Comptabiliser une nuit si la date spécifiée est comprise entre la date de début et la date de fin de l'événement
         if (specifiedDate >= startDate && specifiedDate < endDate) {
             totalNights += event.nombreParticipants;
         }
@@ -117,65 +167,6 @@ function calculateNightsForDate(dateString, events) {
     return totalNights;
 }
 
-// Met à jour le tableau des repas
-function updateMealsTable(events) {
-    const mealsTable = document.getElementById('mealsTable');
-    mealsTable.innerHTML = '';
-    createMealsTableHalf(mealsTable, events, 0, 4, true); // Première moitié avec en-tête (jusqu'au 4ème jour)
-    mealsTable.appendChild(document.createElement('br'));
-    createMealsTableHalf(mealsTable, events, 4, 9, false); // Deuxième moitié sans en-tête (à partir du 5ème jour)
-}
-
-// Crée une moitié du tableau des repas
-function createMealsTableHalf(mealsTable, events, startDay, endDay, includeHeader) {
-    const daysRow = document.createElement('tr');
-    const mealTypesRow = document.createElement('tr'); // Ligne pour les types de repas
-    const mealsCountRow = document.createElement('tr');
-
-    if (includeHeader) {
-        daysRow.appendChild(createHeaderCell("Type"));
-        mealTypesRow.appendChild(createHeaderCell("Repas"));
-        mealsCountRow.appendChild(createHeaderCell("Convives"));
-    }
-
-    for (let i = startDay; i < endDay; i++) {
-        const dayDate = new Date(currentWeekStart);
-        dayDate.setDate(dayDate.getDate() + i);
-        const dayCell = createDayCell(dayDate);
-        dayCell.setAttribute('colspan', '2');
-        daysRow.appendChild(dayCell);
-
-        // Créer les cellules pour les types de repas
-        mealTypesRow.appendChild(createMealTypeCell('Déjeuner'));
-        mealTypesRow.appendChild(createMealTypeCell('Dîner'));
-
-        // Créer les cellules pour le nombre de convives
-        mealsCountRow.appendChild(createMealsCountCell(dayDate, events, 'dejeuner'));
-        mealsCountRow.appendChild(createMealsCountCell(dayDate, events, 'diner'));
-    }
-
-    mealsTable.appendChild(daysRow);
-    if (includeHeader) {
-        mealsTable.appendChild(mealTypesRow);
-    }
-    mealsTable.appendChild(mealsCountRow);
-}
-
-// Crée une cellule pour le type de repas (Déjeuner ou Dîner)
-function createMealTypeCell(mealType) {
-    const cell = document.createElement('td');
-    cell.textContent = mealType;
-    return cell;
-}
-
-// Crée une cellule pour le nombre total de convives pour un repas donné
-function createMealsCountCell(date, events, mealType) {
-    const cell = document.createElement('td');
-    cell.textContent = calculateMealsForDate(date.toISOString().split('T')[0], events, mealType);
-    return cell;
-}
-
-// Calcule le nombre total de repas pour une date et un type de repas donnés
 function calculateMealsForDate(dateString, events, mealType) {
     const specifiedDate = new Date(dateString);
     specifiedDate.setHours(0, 0, 0, 0);
@@ -185,8 +176,9 @@ function calculateMealsForDate(dateString, events, mealType) {
         const startDate = new Date(event.dateDebut);
         const endDate = new Date(event.dateFin);
 
-        if (specifiedDate >= startDate && specifiedDate < endDate) {
-            // Ajoutez une logique supplémentaire si nécessaire pour distinguer les types de repas
+        // Comptabiliser un repas si la date spécifiée est comprise entre la date de début et la date de fin de l'événement
+        // et si le type de repas correspond
+        if (specifiedDate >= startDate && specifiedDate < endDate && event.typeRepas === mealType) {
             totalMeals += event.nombreParticipants;
         }
     });
@@ -206,3 +198,5 @@ document.getElementById('nextWeek').addEventListener('click', () => {
     updateWeekLabel();
     loadData();
 });
+
+
