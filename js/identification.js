@@ -1,36 +1,74 @@
-// Importez les fonctions requises depuis les SDK Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { db } from './firebaseConfig.js';
 
-// Configuration Firebase (remplacez avec votre propre configuration)
-const firebaseConfig = {
-    apiKey: "AIzaSyCcrsekQLQFxfz_a2Ti4FaT6zj74kkF8aE",
-    authDomain: "i-met-f007d.firebaseapp.com",
-    projectId: "i-met-f007d",
-    storageBucket: "i-met-f007d.appspot.com",
-    messagingSenderId: "222760135412",
-    appId: "1:222760135412:web:109b02e73fa819b1a44ca1",
-    measurementId: "G-XDJF1R2HDJ"
-};
-
-// Initialisez Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// Fonction pour charger et afficher les utilisateurs
 async function loadUsers() {
     const usersCol = collection(db, 'Users');
-    const q = query(usersCol, orderBy("Name")); // Trie par le champ 'Name'
+    const q = query(usersCol, where('actif', '==', 'true'));
     const userSnapshot = await getDocs(q);
-    const userList = userSnapshot.docs.map(doc => doc.data().Name); // Récupère les noms
-
-    // Affiche les utilisateurs
-    const userListElement = document.getElementById("userList");
-    userList.forEach(Name => {
-        const li = document.createElement("li");
-        li.textContent = Name;
-        userListElement.appendChild(li);
-    });
+    return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-loadUsers();
+function generateFamilyTree(users) {
+    let familyMap = {};
+    users.forEach(user => {
+        if (user.Parent === "") {
+            familyMap[user.id] = {
+                name: user.Name,
+                children: []
+            };
+        }
+    });
+
+    users.forEach(user => {
+        if (user.Parent !== "") {
+            if (familyMap[user.Parent]) {
+                familyMap[user.Parent].children.push({id: user.id, name: user.Name});
+            }
+        }
+    });
+
+    let treeContainer = document.createElement('div');
+    for (let parentId in familyMap) {
+        let parent = familyMap[parentId];
+        let parentButton = createFamilyButton(parent.name, `collapseChildren${parentId}`);
+        treeContainer.appendChild(parentButton);
+
+        let childrenContainer = document.createElement('div');
+        childrenContainer.id = `collapseChildren${parentId}`;
+        childrenContainer.className = 'collapse';
+        treeContainer.appendChild(childrenContainer);
+
+        parent.children.forEach(child => {
+            let childButton = createFamilyButton(child.name, '');
+            childrenContainer.appendChild(childButton);
+        });
+    }
+
+    return treeContainer;
+}
+
+function createFamilyButton(name, collapseId) {
+    let button = document.createElement('button');
+    button.textContent = name;
+    button.style.display = 'block'; // Ajoutez cette ligne pour afficher le bouton en tant que bloc
+    button.onclick = function() {
+        let collapseElement = document.getElementById(collapseId);
+        if (collapseElement) {
+            toggleCollapse(collapseElement);
+        }
+    };
+    return button;
+}
+
+function toggleCollapse(element) {
+    element.style.display = element.style.display === "none" ? "block" : "none";
+}
+
+document.getElementById('toggleButton').addEventListener('click', async function() {
+    var familyTree = document.getElementById('familyTree');
+    const users = await loadUsers();
+    familyTree.innerHTML = '';
+    familyTree.appendChild(generateFamilyTree(users));
+    toggleCollapse(familyTree);
+});

@@ -84,3 +84,7 @@ th, td {
 th {
     background-color: #f2f2f2;
 }
+#familyTree button {
+    display: block;
+    width: 100%;
+}

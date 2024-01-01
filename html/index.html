@@ -1,48 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Liste des Utilisateurs - I MET</title>
-    <!-- Ajoutez vos liens CSS ici -->
+    <title>I MET</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <script type="module" src="../js/identification.js"></script>
 </head>
 <body>
-    <h1>Liste des Utilisateurs</h1>
-    <ul id="userList"></ul>
+    <h1>I MET</h1>
+    <h2>Je suis ?</h2>
+    <div id="userContainer" class="container"></div>
 
-    <!-- Configuration Firebase -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<button id="toggleButton">Bouton 1</button>
+<div id="familyTree" class="collapse">
+    <!-- L'arbre généalogique sera généré ici -->
+</div>
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyCcrsekQLQFxfz_a2Ti4FaT6zj74kkF8aE",
-        authDomain: "i-met-f007d.firebaseapp.com",
-        projectId: "i-met-f007d",
-        storageBucket: "i-met-f007d.appspot.com",
-        messagingSenderId: "222760135412",
-        appId: "1:222760135412:web:109b02e73fa819b1a44ca1",
-        measurementId: "G-XDJF1R2HDJ"
-      };
+<script>
+    document.getElementById('toggleButton').addEventListener('click', function() {
+        var familyTree = document.getElementById('familyTree');
+        familyTree.innerHTML = generateFamilyTree();
+        familyTree.style.display = familyTree.style.display === 'none' ? 'block' : 'none';
+    });
 
-      // Initialisez Firebase
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+    function generateFamilyTree() {
+        var familyData = {
+            'Parent 1': ['Enfant 1', 'Enfant 2'],
+            'Parent 2': ['Enfant 1']
+        };
 
-      // Logique pour charger et afficher les utilisateurs
-      async function loadUsers() {
-          const usersCol = collection(db, 'Users');
-          const q = query(usersCol, orderBy("Name")); // Trie par le champ 'Name'
-          const userSnapshot = await getDocs(q);
-          const userList = userSnapshot.docs.map(doc => doc.data().Name); // Récupère les noms
+        var treeText = '';
+        for (var parent in familyData) {
+            treeText += parent + ' : ' + familyData[parent].join(', ') + '<br>';
+        }
 
-          const userListElement = document.getElementById("userList");
-          userList.forEach(Name => {
-              const li = document.createElement("li");
-              li.textContent = Name;
-              userListElement.appendChild(li);
-          });
-      }
+        return treeText;
+    }
+</script>
 
-      loadUsers();
-    </script>
+
 </body>
 </html>
