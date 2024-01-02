@@ -16,18 +16,32 @@ body {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .modal-content {
-        width: 95%;
+        width: 80%; /* Largeur plus grande pour les petits écrans */
     }
 }
 
+
+/* Style pour le label et la liste des participants */
+#modalPopup label[for="participants"],
+#modalPopup #selectedParticipantsList {
+    display: block; /* Affiche le label et la liste en bloc, les forçant à occuper leur propre ligne */
+    margin-top: 5px; /* Espace au-dessus du label et de la liste */
+}
+
+/* Style pour le bouton 'Ajouter participants' */
+#btnAjouterParticipants {
+    display: block; /* Affiche le bouton en bloc, le forçant à occuper sa propre ligne */
+    margin-top: 5px; /* Espace au-dessus du bouton */
+    margin-bottom: 0px;
+}
 
 /* Style pour la modal */
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1001;
     left: 0;
     top: 0;
     width: 100%;
@@ -39,13 +53,16 @@ body {
 }
 
 .modal-content {
+    position: relative;
     background-color: #fefefe;
-    margin: 5% auto;
+    margin: 5% auto; /* Centrage horizontal */
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
+    width: 50%; /* Largeur de la modal */
+    transform: translateY(-50%); /* Centrage vertical */
+    top: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Ombre pour la mise en avant */
 }
-
 .close {
     color: #aaa;
     float: right;

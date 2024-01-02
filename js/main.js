@@ -112,12 +112,18 @@ async function fetchEvents(fetchInfo, successCallback, failureCallback) {
 // Fonctions pour gérer les modalités
 function ouvrirModal(nouvelEvenement = false) {
     if (nouvelEvenement) {
-        document.getElementById('presenceForm').dataset.eventId = ''; // Réinitialiser eventId pour un nouvel événement
+        document.getElementById('presenceForm').dataset.eventId = ''; // Reset eventId for a new event
     }
     document.getElementById('dateDebut').value = convertirDatePourAffichage(selectedDate);
     document.getElementById('dateFin').value = convertirDatePourAffichage(selectedDate);
     document.getElementById('modalPopup').style.display = 'block';
     chargerListeParticipants();
+
+    // Update the participants list in the main popup
+    const participantsList = document.getElementById('participantsList'); // Ensure this element exists
+    if (participantsList) {
+        participantsList.innerHTML = ''; // Clear previous list
+    }
 }
 
 // Fonction pour charger un événement pour modification
@@ -195,22 +201,30 @@ async function chargerListeParticipants() {
     try {
         const usersCol = collection(db, 'Users');
         const userSnapshot = await getDocs(usersCol);
-        const userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(user => user.actif);
-        console.log('Utilisateurs chargés:', userList);
-        const checkboxesContainer = document.getElementById('participantCheckboxes');
-        checkboxesContainer.innerHTML = ''; // Nettoyer les cases à cocher précédentes
+        let userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(user => user.actif);
 
+        // Sort users by age (assuming you have a 'birthYear' or similar field)
+        userList.sort((a, b) => b.birthYear - a.birthYear);
+
+        const checkboxesContainer = document.getElementById('participantCheckboxes');
+        checkboxesContainer.innerHTML = '';
+
+        const currentUser = sessionStorage.getItem('userId');
         userList.forEach((user, index) => {
             let checkboxId = `participant-${index}`;
-        
+
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.id = checkboxId;
-            checkbox.value = user.id; // Utilisez l'ID unique comme valeur
+            checkbox.value = user.id; // Utilize the unique ID as value
+
+            if (user.id === currentUser) {
+                checkbox.checked = true;
+            }
 
             let label = document.createElement('label');
             label.htmlFor = checkboxId;
-            label.textContent = user.Name; // Nom pour l'affichage
+            label.textContent = user.Name; // Name for display
 
             checkboxesContainer.appendChild(checkbox);
             checkboxesContainer.appendChild(label);
@@ -221,17 +235,32 @@ async function chargerListeParticipants() {
 }
 
 
+
 window.ouvrirChoixParticipants = function() {
-    document.getElementById('choixParticipants').style.display = 'block';
-    chargerListeParticipants();
+    const modalChoixParticipants = document.getElementById('choixParticipants');
+    if (modalChoixParticipants) {
+        modalChoixParticipants.style.display = 'block';
+        chargerListeParticipants();
+    }
 };
 
-function fermerChoixParticipants() {
-    document.getElementById('choixParticipants').style.display = 'none';
-}
+window.fermerChoixParticipants = function() {
+    const modalChoixParticipants = document.getElementById('choixParticipants');
+    if (modalChoixParticipants) {
+        modalChoixParticipants.style.display = 'none';
+    }
+};
 
 window.validerSelectionParticipants = function() {
-    // Votre logique pour récupérer et stocker les participants sélectionnés
+    let selectedParticipants = [];
+    document.querySelectorAll('#participantCheckboxes input[type=checkbox]:checked').forEach(cb => {
+        selectedParticipants.push(cb.nextSibling.textContent);
+    });
+
+    // Mettez à jour la liste dans la première popup
+    const selectedParticipantsList = document.getElementById('selectedParticipantsList');
+    selectedParticipantsList.innerHTML = selectedParticipants.join('<br>');
+
     fermerChoixParticipants();
 };
 

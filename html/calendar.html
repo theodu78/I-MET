@@ -50,8 +50,11 @@
                     <option value="diner">le dîner</option>
                 </select><br><br>
 
+                <button type="button" id="btnAjouterParticipants" onclick="window.ouvrirChoixParticipants()">Ajouter participants</button>
+                <br>
                 <label for="participants">Participants:</label>
-                <!-- ... -->
+                <div id="selectedParticipantsList"></div>
+                
                 <button type="button" onclick="window.sauvegarderPresence()">Valider</button>
                 <button type="button" id="btnSupprimer" style="display:none;" onclick="window.supprimerEvenement()">Supprimer</button>
             </form>
@@ -60,9 +63,9 @@
     </div>
 
     <div id="choixParticipants" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close" onclick="fermerChoixParticipants()">&times;</span>
-            <div id="participantCheckboxes">
+            <div class="modal-content">
+                <span class="close" onclick="fermerChoixParticipants()">&times;</span>
+                <div id="participantCheckboxes">
                 <!-- Les cases à cocher seront ajoutées dynamiquement ici -->
             </div>
             <button type="button" onclick="validerSelectionParticipants()">Sélectionner</button>
