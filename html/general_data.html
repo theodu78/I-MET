@@ -5,6 +5,18 @@
     <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
+    <nav class="top-nav">
+        <div class="logo">
+            <img src="../data/logo.png" alt="Logo" style="height: 40px;"> <!-- Adjust height as needed -->
+        </div>
+        <div id="userNameDisplay"></div>
+        <button class="menu-button" onclick="toggleMenu()">☰</button>
+    </nav>
+    <div class="menu" id="menu">
+        <a href="calendar.html">Calendar</a>
+        <a href="beds_meals.html">Beds & Meals</a>
+        <a href="general_data.html">General Data</a>
+    </div>
     <h1>Informations de l'utilisateur</h1>
     <div id="userInfo">
         <!-- Informations de l'utilisateur seront affichées ici -->
@@ -25,5 +37,17 @@
 
     <script src="../js/firebaseConfig.js" type="module"></script>
     <script src="../js/general_data.js" type="module"></script>
+    <script>
+        window.onload = function() {
+            // Display user's name from session storage
+            const userName = sessionStorage.getItem('userName');
+            document.getElementById('userNameDisplay').textContent = userName;
+        };
+    
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
 </body>
 </html>

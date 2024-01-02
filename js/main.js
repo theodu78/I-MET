@@ -286,3 +286,57 @@ function getEmoji(repas) {
             return '';
     }
 }
+
+window.onload = function() {
+    // Display user's name from session storage
+    const userName = sessionStorage.getItem('userName');
+    document.getElementById('userNameDisplay').textContent = userName;
+
+    // Close the menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('menu');
+        const menuButton = document.querySelector('.menu-button');
+        if (event.target !== menuButton && !menu.contains(event.target)) {
+            menu.style.display = 'none';
+            adjustContentMargin();
+        }
+    });
+};
+
+function toggleMenu() {
+    const menu = document.getElementById('menu');
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+    } else {
+        menu.style.display = 'block';
+    }
+    adjustContentMargin();
+}
+
+function adjustContentMargin() {
+    const menu = document.getElementById('menu');
+    const content = document.querySelector('body'); // Adjust this selector as needed
+    if (menu.style.display === 'block') {
+        content.style.marginTop = (menu.offsetHeight + 50) + 'px'; // Pushes content down
+    } else {
+        content.style.marginTop = '50px'; // Adjust this to your original top margin
+    }
+}
+async function displayUserName() {
+    const userId = sessionStorage.getItem('userId');
+    if (userId) {
+        const userRef = doc(db, 'Users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            document.getElementById('userNameDisplay').textContent = userData.Name;
+        } else {
+            console.log('User not found');
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    displayUserName();
+});

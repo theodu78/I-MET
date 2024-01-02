@@ -9,34 +9,6 @@
     <h1>I MET</h1>
     <h2>Je suis ?</h2>
     <div id="userContainer" class="container"></div>
-
-<button id="toggleButton">Bouton 1</button>
-<div id="familyTree" class="collapse">
-    <!-- L'arbre généalogique sera généré ici -->
-</div>
-
-<script>
-    document.getElementById('toggleButton').addEventListener('click', function() {
-        var familyTree = document.getElementById('familyTree');
-        familyTree.innerHTML = generateFamilyTree();
-        familyTree.style.display = familyTree.style.display === 'none' ? 'block' : 'none';
-    });
-
-    function generateFamilyTree() {
-        var familyData = {
-            'Parent 1': ['Enfant 1', 'Enfant 2'],
-            'Parent 2': ['Enfant 1']
-        };
-
-        var treeText = '';
-        for (var parent in familyData) {
-            treeText += parent + ' : ' + familyData[parent].join(', ') + '<br>';
-        }
-
-        return treeText;
-    }
-</script>
-
-
+    <div id="familyTree" class="collapse"></div>
 </body>
 </html>
