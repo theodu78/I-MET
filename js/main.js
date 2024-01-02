@@ -28,19 +28,18 @@ document.addEventListener('DOMContentLoaded', function() {
         locale: 'fr',
         firstDay: 1,
         displayEventTime: false,
+        height: 'auto', 
         events: fetchEvents,
         dateClick: function(info) {
-            selectedDate = info.dateStr; // Mise à jour de selectedDate à chaque clic sur une date
+            selectedDate = info.dateStr; // Update selectedDate on date click
             if (calendar.view.type === 'dayGridMonth') {
                 calendar.changeView('timeGridDay', selectedDate);
                 document.getElementById('retourMois').style.display = 'block';
             }
         },
-
         eventClick: function(info) {
             const eventId = info.event.id;
             const eventRef = doc(db, "Events", eventId);
-
             getDoc(eventRef).then((docSnap) => {
                 if (docSnap.exists()) {
                     chargerEvenementPourModification(info.event);
@@ -49,6 +48,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     calendar.refetchEvents();
                 }
             });
+        },
+        windowResize: function(view) {
+            if (window.innerWidth < 768) {
+                calendar.changeView('listWeek');
+            } else {
+                calendar.changeView('dayGridMonth');
+            }
         }
     });
 

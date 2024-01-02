@@ -7,9 +7,9 @@
 </head>
 <body>
     <nav class="top-nav">
-<div class="logo">
-    <img src="../data/logo.png" alt="Logo" style="height: 40px;"> <!-- Adjust height as needed -->
-</div>
+        <div class="logo">
+            <img src="../data/logo.png" alt="Logo" style="height: 40px;">
+        </div>
         <div id="userNameDisplay"></div>
         <button class="menu-button" onclick="toggleMenu()">☰</button>
     </nav>
@@ -18,9 +18,12 @@
         <a href="beds_meals.html">Beds & Meals</a>
         <a href="general_data.html">General Data</a>
     </div>
-    <button id="retourMois" style="display: none;">&lt; Vue Mois</button>
-    <div id="calendar"></div>
+
+    <!-- Bouton déplacé au-dessus du calendrier -->
     <button id="declarerSejour">Déclarer un Séjour</button>
+
+    <div id="calendar"></div>
+    <button id="retourMois" style="display: none;">&lt; Vue Mois</button>
 
     <!-- Modal Popup -->
     <div id="modalPopup" class="modal" style="display: none;">
@@ -48,9 +51,7 @@
                 </select><br><br>
 
                 <label for="participants">Participants:</label>
-                
-
-                <button type="button" id="btnAjouterParticipants" onclick="ouvrirChoixParticipants()">Ajouter participants</button>
+                <!-- ... -->
                 <button type="button" onclick="window.sauvegarderPresence()">Valider</button>
                 <button type="button" id="btnSupprimer" style="display:none;" onclick="window.supprimerEvenement()">Supprimer</button>
             </form>
