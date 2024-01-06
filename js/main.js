@@ -42,13 +42,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const eventRef = doc(db, "Events", eventId);
             getDoc(eventRef).then((docSnap) => {
                 if (docSnap.exists()) {
-                    chargerEvenementPourModification(info.event);
+                    chargerEvenementPourModification(info.event, docSnap.data());
                 } else {
                     alert("Cet événement a été supprimé.");
                     calendar.refetchEvents();
                 }
             });
         },
+        
         windowResize: function(view) {
             if (window.innerWidth < 768) {
                 calendar.changeView('listWeek');
@@ -108,33 +109,46 @@ async function fetchEvents(fetchInfo, successCallback, failureCallback) {
     }
 }
 
-
-// Fonctions pour gérer les modalités
 function ouvrirModal(nouvelEvenement = false) {
-    if (nouvelEvenement) {
-        document.getElementById('presenceForm').dataset.eventId = ''; // Reset eventId for a new event
-    }
-    document.getElementById('dateDebut').value = convertirDatePourAffichage(selectedDate);
-    document.getElementById('dateFin').value = convertirDatePourAffichage(selectedDate);
-    document.getElementById('modalPopup').style.display = 'block';
-    chargerListeParticipants();
+    const modal = document.getElementById('modalPopup');
+    const participantsList = document.getElementById('selectedParticipantsList');
+    participantsList.innerHTML = ''; // Réinitialiser la liste des participants
 
-    // Update the participants list in the main popup
-    const participantsList = document.getElementById('participantsList'); // Ensure this element exists
-    if (participantsList) {
-        participantsList.innerHTML = ''; // Clear previous list
+    if (nouvelEvenement) {
+        document.getElementById('presenceForm').dataset.eventId = ''; // Réinitialiser l'ID de l'événement pour un nouvel événement
+        // Ajouter l'utilisateur connecté à la liste des participants
+        const currentUser = sessionStorage.getItem('userId');
+        participantsList.innerHTML = sessionStorage.getItem('userName');
+        document.getElementById('btnAjouterParticipants').dataset.currentParticipants = JSON.stringify([currentUser]);
+
+        // Définir les valeurs des champs dateDebut et dateFin
+        document.getElementById('dateDebut').value = convertirDatePourAffichage(selectedDate);
+        document.getElementById('dateFin').value = convertirDatePourAffichage(selectedDate);
     }
+
+    modal.style.display = 'block';
+    chargerListeParticipants(); // Charger la liste des participants pour le second popup
 }
 
+
+
 // Fonction pour charger un événement pour modification
-function chargerEvenementPourModification(event) {
+function chargerEvenementPourModification(event, eventData) {
     document.getElementById('dateDebut').value = convertirDatePourAffichage(event.start.toISOString());
     document.getElementById('dateFin').value = event.end ? convertirDatePourAffichage(event.end.toISOString()) : convertirDatePourAffichage(event.start.toISOString());
     document.getElementById('presenceForm').dataset.eventId = event.id;
     document.getElementById('modalPopup').style.display = 'block';
-    chargerListeParticipants(); // Chargement des participants à chaque modification
+    document.getElementById('selectedParticipantsList').innerHTML = '';
     document.getElementById('btnSupprimer').style.display = 'block'; // Affichage du bouton Supprimer
+
+    // Récupérer les participants existants pour cet événement
+    getParticipantNames(eventData.participants || []).then(participantNames => {
+        const participantsList = document.getElementById('selectedParticipantsList');
+        participantsList.innerHTML = participantNames.join('<br>');
+        document.getElementById('btnAjouterParticipants').dataset.currentParticipants = JSON.stringify(eventData.participants || []);
+    });
 }
+
 
 // Fonctions pour gérer les événements Firebase
 window.sauvegarderPresence = async function() {
@@ -146,6 +160,7 @@ window.sauvegarderPresence = async function() {
     var dateDebut = convertirDateEnISO(document.getElementById('dateDebut').value) + 'T' + getHeureDebut(document.getElementById('repasDebut').value);
     var dateFin = convertirDateEnISO(document.getElementById('dateFin').value) + 'T' + getHeureFin(document.getElementById('repasFin').value);
     var participants = Array.from(document.querySelectorAll('#participantCheckboxes input[type=checkbox]:checked')).map(cb => cb.value);
+    var participants = JSON.parse(document.getElementById('btnAjouterParticipants').dataset.currentParticipants || '[]');
 
     var eventData = {
         dateDebut,
@@ -253,13 +268,18 @@ window.fermerChoixParticipants = function() {
 
 window.validerSelectionParticipants = function() {
     let selectedParticipants = [];
+    let selectedParticipantIds = [];
     document.querySelectorAll('#participantCheckboxes input[type=checkbox]:checked').forEach(cb => {
         selectedParticipants.push(cb.nextSibling.textContent);
+        selectedParticipantIds.push(cb.value);
     });
 
     // Mettez à jour la liste dans la première popup
     const selectedParticipantsList = document.getElementById('selectedParticipantsList');
     selectedParticipantsList.innerHTML = selectedParticipants.join('<br>');
+
+    // Mettre à jour les participants actuels dans le bouton 'Ajouter participants'
+    document.getElementById('btnAjouterParticipants').dataset.currentParticipants = JSON.stringify(selectedParticipantIds);
 
     fermerChoixParticipants();
 };

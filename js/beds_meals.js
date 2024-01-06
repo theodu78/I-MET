@@ -151,24 +151,25 @@ function createMealsCountCell(date, events, mealType) {
 
 function calculateNightsForDate(dateString, events) {
     const specifiedDate = new Date(dateString);
-    specifiedDate.setHours(0, 0, 0, 0);
+    // Définir les heures pour le soir et le matin du jour suivant
+    const eveningTime = new Date(specifiedDate.getFullYear(), specifiedDate.getMonth(), specifiedDate.getDate(), 23, 30);
+    const nextMorningTime = new Date(specifiedDate.getFullYear(), specifiedDate.getMonth(), specifiedDate.getDate() + 1, 7, 30);
+
     let totalNights = 0;
 
     events.forEach(event => {
-        const startDate = new Date(event.dateDebut);
-        const endDate = new Date(event.dateFin);
-        // La date de début doit être ajustée pour inclure uniquement la journée, sans l'heure
-        startDate.setHours(0, 0, 0, 0);
+        const eventStartDate = new Date(event.dateDebut);
+        const eventEndDate = new Date(event.dateFin);
 
-        // Comptabiliser une nuit si la date spécifiée est la même que la date de début de l'événement
-        // La logique a été changée pour comparer uniquement les dates sans tenir compte des heures
-        if (specifiedDate.getTime() === startDate.getTime()) {
+        // Vérifier si l'événement se déroule pendant la période de nuit spécifiée
+        if (eventStartDate <= eveningTime && eventEndDate >= nextMorningTime) {
             totalNights += event.nombreParticipants;
         }
     });
 
     return totalNights;
 }
+
 
 
 function calculateMealsForDate(dateString, events, mealType) {
