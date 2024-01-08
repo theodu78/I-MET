@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         dateClick: function(info) {
             selectedDate = info.dateStr; // Update selectedDate on date click
             if (calendar.view.type === 'dayGridMonth') {
-                calendar.changeView('timeGridDay', selectedDate);
+                calendar.changeView('listWeek', selectedDate);
                 document.getElementById('retourMois').style.display = 'block';
             }
         },

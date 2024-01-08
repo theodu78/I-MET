@@ -10,17 +10,52 @@ body {
     margin: 40px auto; /* Centrer le calendrier horizontalement */
 }
 
+/* Styles adaptés pour les smartphones */
 @media (max-width: 768px) {
     #calendar {
         max-width: 100%;
+        margin: 20px auto;
+    }
+
+    .modal-content {
+        width: 90%; /* Largeur adaptée pour les petits écrans */
+        margin: 10% auto; /* Ajustement de la marge pour centrer verticalement */
+        padding: 10px; /* Padding réduit pour les petits écrans */
+    }
+
+    /* Réduction de la taille des boutons pour qu'ils s'adaptent mieux aux petits écrans */
+    #familyTree button, #btnAjouterParticipants {
+        width: 100%;
+        font-size: 14px; /* Taille de police réduite pour un meilleur ajustement */
+    }
+
+    /* Adapter la taille du texte et des éléments de formulaire pour une meilleure lisibilité */
+    input[type="text"], select, button {
+        font-size: 16px; /* Taille de police plus grande pour les écrans tactiles */
+    }
+
+    .modal {
+        padding-top: 30px; /* Padding-top réduit pour les petits écrans */
+    }
+
+    /* Ajustement du positionnement et du padding du contenu modal pour les petits écrans */
+    .modal-content {
+        padding: 10px;
+        transform: translateY(-20%); /* Ajustement du centrage vertical */
+    }
+
+    /* Réduire la taille et le padding des éléments de la navbar pour une meilleure utilisation sur mobile */
+    .top-nav .logo img, .menu-button, .menu a {
+        height: 30px; /* Réduction de la taille du logo */
+        padding: 5px; /* Réduction du padding */
+    }
+
+    /* Styles spécifiques aux mobiles pour le menu déroulant et la navigation */
+    .menu {
+        display: block; /* Affichage en bloc pour s'adapter aux petits écrans */
     }
 }
 
-@media (max-width: 768px) {
-    .modal-content {
-        width: 80%; /* Largeur plus grande pour les petits écrans */
-    }
-}
 
 
 /* Style pour le label et la liste des participants */

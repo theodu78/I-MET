@@ -51,3 +51,36 @@ body {
     background-color: #ddd;
     color: black;
 }
+
+/* Ajout de règles médias pour les smartphones */
+@media (max-width: 768px) {
+    /* Réduire la hauteur de la barre de navigation et la taille du logo */
+    .top-nav {
+        padding: 0.5rem;
+    }
+
+    .logo img {
+        height: 2rem; /* Hauteur plus petite pour les petits écrans */
+    }
+
+    /* Ajuster la taille du bouton de menu pour qu'il soit plus accessible */
+    .menu-button {
+        font-size: 2rem; /* Icône de menu plus grande pour les écrans tactiles */
+    }
+
+    /* Adapter la marge supérieure du corps pour la hauteur réduite de la barre de navigation */
+    body {
+        margin-top: 40px; /* Diminution de la marge supérieure pour les petits écrans */
+    }
+
+    /* Ajuster le positionnement et la taille du menu déroulant */
+    .menu {
+        top: 40px; /* Réduction pour correspondre à la hauteur ajustée de la barre de navigation */
+    }
+
+    /* Agrandir les liens du menu pour une meilleure accessibilité */
+    .menu a {
+        padding: 15px; /* Plus de padding pour les liens du menu */
+        font-size: 1.2rem; /* Taille de police augmentée pour les écrans tactiles */
+    }
+}
