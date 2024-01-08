@@ -1,0 +1,53 @@
+/* Style pour la barre de navigation principale */
+.top-nav {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+}
+
+/* Style pour le logo dans la barre de navigation */
+.logo img {
+    height: 3rem; /* Ajustez selon vos besoins */
+    width: auto; /* Conserve le ratio d'aspect */
+}
+
+/* Style pour le bouton de menu dans la barre de navigation */
+.menu-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-left: auto; /* Pousse le bouton vers la droite */
+}
+
+/* Style pour le corps - ajustez en fonction de la hauteur de votre barre de navigation */
+body {
+    margin-top: 50px; /* Ajustez cette valeur en fonction de la hauteur de votre barre de navigation */
+}
+
+/* Styles pour le menu déroulant */
+.menu {
+    display: none;
+    background-color: #333;
+    position: fixed;
+    top: 50px; /* Ajustez ceci à la hauteur de votre barre de navigation */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: 1000; /* Assure que le menu est au-dessus des autres éléments */
+}
+
+.menu a {
+    display: block;
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.menu a:hover {
+    background-color: #ddd;
+    color: black;
+}
