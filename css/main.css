@@ -12,9 +12,26 @@ body {
 
 /* Styles adaptés pour les smartphones */
 @media (max-width: 768px) {
+
+    body {
+        font-size: 16px; /* ou plus grand si nécessaire */
+    }
+
     #calendar {
         max-width: 100%;
         margin: 20px auto;
+        font-size: 14px; /* Taille de police plus grande pour les événements du calendrier */
+    }
+
+    button {
+        padding: 12px 24px; /* Plus de padding pour un toucher facile */
+        font-size: 18px; /* Taille de police plus grande pour les boutons */
+    }
+
+    /* Ajustez la taille des champs de formulaire pour une meilleure accessibilité */
+    input[type="text"], select {
+        font-size: 16px; /* Plus grande taille de police pour les champs de texte et select */
+        padding: 10px; /* Plus de padding pour une meilleure interaction */
     }
 
     .modal-content {
