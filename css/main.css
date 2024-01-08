@@ -14,7 +14,7 @@ body {
 @media (max-width: 768px) {
 
     body {
-        font-size: 16px; /* ou plus grand si nécessaire */
+        font-size: 18px; /* ou plus grand si nécessaire */
     }
 
     #calendar {
@@ -24,20 +24,20 @@ body {
     }
 
     button {
-        padding: 12px 24px; /* Plus de padding pour un toucher facile */
-        font-size: 18px; /* Taille de police plus grande pour les boutons */
+        padding: 15px 30px; /* Plus de padding pour un toucher facile */
+        font-size: 20px; /* Taille de police plus grande pour les boutons */
     }
 
     /* Ajustez la taille des champs de formulaire pour une meilleure accessibilité */
     input[type="text"], select {
-        font-size: 16px; /* Plus grande taille de police pour les champs de texte et select */
-        padding: 10px; /* Plus de padding pour une meilleure interaction */
+        font-size: 18px; /* Plus grande taille de police pour les champs de texte et select */
+        padding: 12px; /* Plus de padding pour une meilleure interaction */
     }
 
     .modal-content {
-        width: 90%; /* Largeur adaptée pour les petits écrans */
+        width: 95%; /* Largeur adaptée pour les petits écrans */
         margin: 10% auto; /* Ajustement de la marge pour centrer verticalement */
-        padding: 10px; /* Padding réduit pour les petits écrans */
+        padding: 15px; /* Padding réduit pour les petits écrans */
     }
 
     /* Réduction de la taille des boutons pour qu'ils s'adaptent mieux aux petits écrans */
@@ -63,13 +63,23 @@ body {
 
     /* Réduire la taille et le padding des éléments de la navbar pour une meilleure utilisation sur mobile */
     .top-nav .logo img, .menu-button, .menu a {
-        height: 30px; /* Réduction de la taille du logo */
+        height: 40px; /* Réduction de la taille du logo */
         padding: 5px; /* Réduction du padding */
     }
 
     /* Styles spécifiques aux mobiles pour le menu déroulant et la navigation */
     .menu {
         display: block; /* Affichage en bloc pour s'adapter aux petits écrans */
+    }
+
+    .menu-button {
+        font-size: 35px; /* Icône de menu plus grande */
+        padding: 20px; /* Plus de padding autour de l'icône pour une zone de toucher plus grande */
+    }
+
+    .menu a {
+        font-size: 22px; /* Taille de police plus grande pour les liens */
+        padding: 15px 20px; /* Plus de padding pour les liens */
     }
 }
 
