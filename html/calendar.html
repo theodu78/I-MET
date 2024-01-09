@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>I MET - Calendar</title>
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/navbar.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 </head>
 <body>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <nav class="top-nav">
         <div class="logo">
             <img src="../data/logo.png" alt="Logo" style="height: 40px;">
@@ -23,10 +23,9 @@
 
     <!-- Bouton déplacé au-dessus du calendrier -->
     <button id="declarerSejour">Déclarer un Séjour</button>
-
-    <div id="calendar"></div>
     <button id="retourMois" style="display: none;">&lt; Vue Mois</button>
-
+    <div id="calendar"></div>
+    
     <!-- Modal Popup -->
     <div id="modalPopup" class="modal" style="display: none;">
         <div class="modal-content">
