@@ -2,15 +2,16 @@
 .top-nav {
     display: flex;
     align-items: center;
-    background-color: #333;
+    background-color: #1e2838;
     color: white;
-    padding: 1rem;
+    padding-top: 0;
 }
 
 /* Style pour le logo dans la barre de navigation */
-.logo img {
-    height: 3rem; /* Ajustez selon vos besoins */
-    width: auto; /* Conserve le ratio d'aspect */
+.logo-img {
+    height: 40px; /* ou la taille souhaitée */
+    width: auto; /* pour conserver les proportions */
+    display: block; /* pour supprimer les marges indésirables autour de l'image */
 }
 
 /* Style pour le bouton de menu dans la barre de navigation */
@@ -56,26 +57,23 @@ body {
 @media (max-width: 768px) {
     /* Réduire la hauteur de la barre de navigation et la taille du logo */
     .top-nav {
-        padding: 0.5rem;
+        padding: 0rem;
+        padding-top: 0;
     }
 
-    .logo img {
-        height: 2rem; /* Hauteur plus petite pour les petits écrans */
+    .logo-img {
+        height: 4rem ; /* une taille plus petite pour les écrans mobiles */
+        padding: 5px
     }
 
     /* Ajuster la taille du bouton de menu pour qu'il soit plus accessible */
     .menu-button {
-        font-size: 2rem; /* Icône de menu plus grande pour les écrans tactiles */
-    }
-
-    /* Adapter la marge supérieure du corps pour la hauteur réduite de la barre de navigation */
-    body {
-        margin-top: 40px; /* Diminution de la marge supérieure pour les petits écrans */
+        font-size: 2.6rem; /* Icône de menu plus grande pour les écrans tactiles */
     }
 
     /* Ajuster le positionnement et la taille du menu déroulant */
     .menu {
-        top: 40px; /* Réduction pour correspondre à la hauteur ajustée de la barre de navigation */
+        top: 20px; /* Réduction pour correspondre à la hauteur ajustée de la barre de navigation */
     }
 
     /* Agrandir les liens du menu pour une meilleure accessibilité */

@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: Helvetica, sans-serif, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box; /* Assure une meilleure gestion de la largeur */
@@ -10,86 +10,30 @@ body {
     margin: 40px auto; /* Centrer le calendrier horizontalement */
 }
 
-/* Styles adaptés pour les smartphones */
-@media (max-width: 768px) {
-
-    body {
-        font-size: 18px; /* ou plus grand si nécessaire */
-    }
-
-    #calendar {
-        max-width: 100%;
-        margin: 20px auto;
-        font-size: 14px; /* Taille de police plus grande pour les événements du calendrier */
-    }
-
-    button {
-        padding: 15px 30px; /* Plus de padding pour un toucher facile */
-        font-size: 20px; /* Taille de police plus grande pour les boutons */
-    }
-
-    /* Ajustez la taille des champs de formulaire pour une meilleure accessibilité */
-    input[type="text"], select {
-        font-size: 18px; /* Plus grande taille de police pour les champs de texte et select */
-        padding: 12px; /* Plus de padding pour une meilleure interaction */
-    }
-
-    .modal-content {
-        width: 95%; /* Largeur adaptée pour les petits écrans */
-        margin: 10% auto; /* Ajustement de la marge pour centrer verticalement */
-        padding: 15px; /* Padding réduit pour les petits écrans */
-    }
-
-    /* Réduction de la taille des boutons pour qu'ils s'adaptent mieux aux petits écrans */
-    #familyTree button, #btnAjouterParticipants {
-        width: 100%;
-        font-size: 14px; /* Taille de police réduite pour un meilleur ajustement */
-    }
-
-    /* Adapter la taille du texte et des éléments de formulaire pour une meilleure lisibilité */
-    input[type="text"], select, button {
-        font-size: 16px; /* Taille de police plus grande pour les écrans tactiles */
-    }
-
-    .modal {
-        padding-top: 30px; /* Padding-top réduit pour les petits écrans */
-    }
-
-    /* Ajustement du positionnement et du padding du contenu modal pour les petits écrans */
-    .modal-content {
-        padding: 10px;
-        transform: translateY(-20%); /* Ajustement du centrage vertical */
-    }
-
-    /* Réduire la taille et le padding des éléments de la navbar pour une meilleure utilisation sur mobile */
-    .top-nav .logo img, .menu-button, .menu a {
-        height: 40px; /* Réduction de la taille du logo */
-        padding: 5px; /* Réduction du padding */
-    }
-
-    /* Styles spécifiques aux mobiles pour le menu déroulant et la navigation */
-    .menu {
-        display: block; /* Affichage en bloc pour s'adapter aux petits écrans */
-    }
-
-    .menu-button {
-        font-size: 35px; /* Icône de menu plus grande */
-        padding: 20px; /* Plus de padding autour de l'icône pour une zone de toucher plus grande */
-    }
-
-    .menu a {
-        font-size: 22px; /* Taille de police plus grande pour les liens */
-        padding: 15px 20px; /* Plus de padding pour les liens */
-    }
-}
-
-
 
 /* Style pour le label et la liste des participants */
 #modalPopup label[for="participants"],
 #modalPopup #selectedParticipantsList {
     display: block; /* Affiche le label et la liste en bloc, les forçant à occuper leur propre ligne */
-    margin-top: 5px; /* Espace au-dessus du label et de la liste */
+    margin-top: 2px; /* Espace au-dessus du label et de la liste */
+}
+
+/* Style pour chaque container de participant */
+.participant-container {
+    display: flex;
+    align-items: center; /* Centre verticalement les éléments */
+    margin-bottom: 10px; /* Espacement entre chaque container */
+}
+
+/* Style pour la case à cocher du participant */
+.participant-checkbox {
+    margin-right: 10px; /* Espace entre la case à cocher et le label */
+}
+
+/* Style pour le label du participant */
+.participant-label {
+    flex-grow: 1; /* Permet au label de prendre l'espace disponible */
+    text-align: left; /* Alignement du texte à gauche */
 }
 
 /* Style pour le bouton 'Ajouter participants' */
@@ -97,6 +41,56 @@ body {
     display: block; /* Affiche le bouton en bloc, le forçant à occuper sa propre ligne */
     margin-top: 5px; /* Espace au-dessus du bouton */
     margin-bottom: 0px;
+    background-color: #086edb; /* Couleur de fond spécifique pour ce bouton */
+}
+
+#btnSupprimer {
+    background-color: #dc3545; /* Couleur de fond rouge pour le bouton supprimer */
+    color: white;
+}
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end; /* Aligner les boutons à droite */
+    padding: 10px; /* Ajustez selon le besoin */
+}
+
+
+.btn-annuler {
+    background-color: #485057; /* Couleur de fond pour le bouton annuler */
+    color: white; /* Texte en blanc */
+    border: none; /* Pas de bordure */
+    padding: 10px 20px; /* Padding autour du texte */
+    margin-top: 10px; /* Marge au-dessus du bouton */
+    cursor: pointer; /* Curseur en forme de pointeur pour indiquer un bouton cliquable */
+    border-radius: 20px; /* Coins arrondis */
+}
+
+.modal-content {
+    /* Autres styles */
+    display: flex; /* Utilisez flex pour gérer l'alignement des éléments internes */
+    flex-direction: column; /* Organise les enfants en colonne */
+}
+
+.modal-content form {
+    flex: 1; /* Donne à la forme la possibilité de grandir et d'occuper l'espace disponible */
+}
+
+.modal-content .modal-buttons {
+    margin-top: 15px; /* Ajoute une marge en haut pour séparer des autres éléments du formulaire */
+}
+
+.btn-annuler:hover {
+    background-color: #d32f2f; /* Couleur de fond plus foncée au survol */
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
 }
 
 /* Style pour la modal */
@@ -109,9 +103,10 @@ body {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
-    padding-top: 60px;
+    display: flex;
+    align-items: center; /* Centre verticalement */
+    justify-content: center; /* Centre horizontalement */
 }
 
 .modal-content {
@@ -122,7 +117,7 @@ body {
     border: 1px solid #888;
     width: 50%; /* Largeur de la modal */
     transform: translateY(-50%); /* Centrage vertical */
-    top: 50%;
+    top: 40%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Ombre pour la mise en avant */
 }
 .close {
@@ -187,4 +182,75 @@ th {
 .clicked {
     background-color: rgb(151, 151, 243);
     color: white;
+}
+/* Styles adaptés pour les smartphones */
+@media (max-width: 768px) {
+
+    body {
+        font-size: 18px; /* ou plus grand si nécessaire */
+    }
+
+    #calendar {
+        max-width: 100%;
+        margin: 20px auto;
+        font-size: 14px; /* Taille de police plus grande pour les événements du calendrier */
+    }
+
+    button {
+        font-size: 1rem; /* Taille de police plus grande pour les boutons */
+        border: none; /* Enlever la bordure */
+        border-radius: 20px; /* Coins arrondis */
+        color: white; /* Texte blanc */
+        background-color: #086edb; /* Couleur de fond bleue */
+        padding: 10px 20px; /* Ajustez le padding comme nécessaire */
+        margin: 10px 0; /* Ajustez la marge comme nécessaire */
+    }
+
+    /* Ajustez la taille des champs de formulaire pour une meilleure accessibilité */
+    input[type="text"], select {
+        font-size: 18px; /* Plus grande taille de police pour les champs de texte et select */
+        padding: 12px; /* Plus de padding pour une meilleure interaction */
+    }
+
+    .modal-content {
+        width: 90%; /* Largeur adaptée pour les petits écrans */
+        margin: auto; /* Ajustement de la marge pour centrer verticalement */
+        padding: 20px; /* Padding réduit pour les petits écrans */
+        border-radius: 10px; /* Ajoutez des coins arrondis */
+        overflow: hidden; /* Pour assurer que le contenu ne dépasse pas des coins arrondis */
+        padding: 20px; /* Ajustez le padding comme nécessaire */
+    }
+
+    /* Réduction de la taille des boutons pour qu'ils s'adaptent mieux aux petits écrans */
+    #familyTree button, #btnAjouterParticipants {
+        width: 100%;
+        font-size: 14px; /* Taille de police réduite pour un meilleur ajustement */
+    }
+
+    /* Adapter la taille du texte et des éléments de formulaire pour une meilleure lisibilité */
+    input[type="text"], select, button {
+        font-size: 16px; /* Taille de police plus grande pour les écrans tactiles */
+    }
+
+    .modal {
+        display: flex; /* Utilisez flex pour centrer la modal */
+        align-items: center; /* Alignement vertical */
+        justify-content: center; /* Alignement horizontal */
+        padding-top: 0; /* Retirez le padding du haut si vous utilisez flex */
+    }
+
+     /* Styles spécifiques aux mobiles pour le menu déroulant et la navigation */
+    .menu {
+        display: block; /* Affichage en bloc pour s'adapter aux petits écrans */
+    }
+
+    .menu-button {
+        font-size: 35px; /* Icône de menu plus grande */
+        padding: 20px; /* Plus de padding autour de l'icône pour une zone de toucher plus grande */
+    }
+
+    .menu a {
+        font-size: 22px; /* Taille de police plus grande pour les liens */
+        padding: 15px 20px; /* Plus de padding pour les liens */
+    }
 }

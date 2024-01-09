@@ -32,22 +32,27 @@ document.addEventListener('DOMContentLoaded', function() {
         events: fetchEvents,
         dateClick: function(info) {
             selectedDate = info.dateStr; // Update selectedDate on date click
-            if (calendar.view.type === 'dayGridMonth') {
-                calendar.changeView('listWeek', selectedDate);
-                document.getElementById('retourMois').style.display = 'block';
-            }
+            calendar.changeView('listWeek', info.dateStr);
+            document.getElementById('retourMois').style.display = 'block';
+
         },
         eventClick: function(info) {
-            const eventId = info.event.id;
-            const eventRef = doc(db, "Events", eventId);
-            getDoc(eventRef).then((docSnap) => {
-                if (docSnap.exists()) {
-                    chargerEvenementPourModification(info.event, docSnap.data());
-                } else {
-                    alert("Cet événement a été supprimé.");
-                    calendar.refetchEvents();
-                }
-            });
+            if (calendar.view.type === 'listWeek') {
+                const eventId = info.event.id;
+                const eventRef = doc(db, "Events", eventId);
+                getDoc(eventRef).then((docSnap) => {
+                    if (docSnap.exists()) {
+                        chargerEvenementPourModification(info.event, docSnap.data());
+                    } else {
+                        alert("Cet événement a été supprimé.");
+                        calendar.refetchEvents();
+                    }
+                });
+            } else {
+                // Dans la vue dayGridMonth, change simplement la vue en listWeek
+                calendar.changeView('listWeek', info.event.start);
+                document.getElementById('retourMois').style.display = 'block';
+            }
         },
         
         windowResize: function(view) {
@@ -112,7 +117,12 @@ async function fetchEvents(fetchInfo, successCallback, failureCallback) {
 function ouvrirModal(nouvelEvenement = false) {
     const modal = document.getElementById('modalPopup');
     const participantsList = document.getElementById('selectedParticipantsList');
+    const btnSupprimer = document.getElementById('btnSupprimer'); // Obtenir le bouton Supprimer
+    
     participantsList.innerHTML = ''; // Réinitialiser la liste des participants
+
+    // Affiche ou cache le bouton Supprimer en fonction de si un nouvel événement est créé ou non
+    btnSupprimer.style.display = nouvelEvenement ? 'none' : 'block';
 
     if (nouvelEvenement) {
         document.getElementById('presenceForm').dataset.eventId = ''; // Réinitialiser l'ID de l'événement pour un nouvel événement
@@ -120,15 +130,16 @@ function ouvrirModal(nouvelEvenement = false) {
         const currentUser = sessionStorage.getItem('userId');
         participantsList.innerHTML = sessionStorage.getItem('userName');
         document.getElementById('btnAjouterParticipants').dataset.currentParticipants = JSON.stringify([currentUser]);
-
-        // Définir les valeurs des champs dateDebut et dateFin
+        // Définir les valeurs des champs dateDebut et dateFin à la date sélectionnée
         document.getElementById('dateDebut').value = convertirDatePourAffichage(selectedDate);
         document.getElementById('dateFin').value = convertirDatePourAffichage(selectedDate);
+    
     }
 
-    modal.style.display = 'block';
+    modal.style.display = 'block'; // Afficher le modal
     chargerListeParticipants(); // Charger la liste des participants pour le second popup
 }
+
 
 
 
@@ -218,36 +229,42 @@ async function chargerListeParticipants() {
         const userSnapshot = await getDocs(usersCol);
         let userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(user => user.actif);
 
-        // Sort users by age (assuming you have a 'birthYear' or similar field)
-        userList.sort((a, b) => b.birthYear - a.birthYear);
+        // Trier les utilisateurs par nom pour une présentation cohérente
+        userList.sort((a, b) => a.Name.localeCompare(b.Name));
 
         const checkboxesContainer = document.getElementById('participantCheckboxes');
         checkboxesContainer.innerHTML = '';
 
         const currentUser = sessionStorage.getItem('userId');
-        userList.forEach((user, index) => {
-            let checkboxId = `participant-${index}`;
+        userList.forEach((user) => {
+            let checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'participant-container';
 
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.id = checkboxId;
-            checkbox.value = user.id; // Utilize the unique ID as value
-
-            if (user.id === currentUser) {
-                checkbox.checked = true;
-            }
+            checkbox.id = `participant-${user.id}`;
+            checkbox.value = user.id; // Utilisez l'ID unique comme valeur
+            checkbox.className = 'participant-checkbox'; // Ajoutez une classe pour le style si nécessaire
 
             let label = document.createElement('label');
-            label.htmlFor = checkboxId;
-            label.textContent = user.Name; // Name for display
+            label.htmlFor = `participant-${user.id}`;
+            label.textContent = user.Name; // Nom pour l'affichage
+            label.className = 'participant-label'; // Ajoutez une classe pour le style si nécessaire
 
-            checkboxesContainer.appendChild(checkbox);
-            checkboxesContainer.appendChild(label);
+            if (user.id === currentUser) {
+                checkbox.checked = true; // Pré-sélectionnez la case à cocher pour l'utilisateur actuel
+            }
+
+            checkboxContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(label);
+
+            checkboxesContainer.appendChild(checkboxContainer);
         });
     } catch (error) {
         console.error("Erreur lors du chargement des utilisateurs: ", error);
     }
 }
+
 
 
 
