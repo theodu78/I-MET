@@ -5,6 +5,7 @@
     background-color: #1e2838;
     color: white;
     padding-top: 0;
+    margin: 0;
 }
 
 /* Style pour le logo dans la barre de navigation */
@@ -19,7 +20,7 @@
     background: none;
     border: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1rem;
     cursor: pointer;
     margin-left: auto; /* Pousse le bouton vers la droite */
 }
@@ -57,7 +58,7 @@ body {
 @media (max-width: 768px) {
     /* Réduire la hauteur de la barre de navigation et la taille du logo */
     .top-nav {
-        padding: 0rem;
+        padding: 0;
         padding-top: 0;
     }
 
@@ -68,12 +69,13 @@ body {
 
     /* Ajuster la taille du bouton de menu pour qu'il soit plus accessible */
     .menu-button {
-        font-size: 2.6rem; /* Icône de menu plus grande pour les écrans tactiles */
+        font-size: 2rem; /* Icône de menu plus grande pour les écrans tactiles */
+        align-items: center;
     }
 
     /* Ajuster le positionnement et la taille du menu déroulant */
     .menu {
-        top: 20px; /* Réduction pour correspondre à la hauteur ajustée de la barre de navigation */
+        top: 10px; /* Réduction pour correspondre à la hauteur ajustée de la barre de navigation */
     }
 
     /* Agrandir les liens du menu pour une meilleure accessibilité */

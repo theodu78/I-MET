@@ -11,26 +11,55 @@ window.addEventListener('load', () => {
     loadData();
 });
 
-// Initialise la semaine courante à partir du jour actuel
+// Initialise la semaine courante à partir du jour actuel, avec le début de la semaine fixé au vendredi
 function initializeWeek() {
     const today = new Date();
     const dayOfWeek = today.getDay();
     currentWeekStart = new Date(today);
-    // Ajustement pour commencer la semaine le samedi
-    currentWeekStart.setDate(today.getDate() - (dayOfWeek + 1) % 7);
+
+    // Ajustez pour que la semaine commence le vendredi
+    // Si aujourd'hui est vendredi (5), samedi (6) ou dimanche (0), ajustez en conséquence
+    if (dayOfWeek === 6) { // Samedi
+        currentWeekStart.setDate(today.getDate() - 1);
+    } else if (dayOfWeek === 0) { // Dimanche
+        currentWeekStart.setDate(today.getDate() - 2);
+    } else {
+        currentWeekStart.setDate(today.getDate() - ((dayOfWeek + 2) % 7));
+    }
     updateWeekLabel();
 }
+
 
 // Met à jour l'étiquette de la semaine actuelle
 function updateWeekLabel() {
     const weekEnd = new Date(currentWeekStart);
-    weekEnd.setDate(currentWeekStart.getDate() + 8);
-    document.getElementById('currentWeek').textContent = `Semaine du ${formatDate(currentWeekStart)} au ${formatDate(weekEnd)}`;
+    weekEnd.setDate(currentWeekStart.getDate() + 9); // Fin de la semaine (9 jours plus tard)
+
+    // Formatage des dates pour obtenir "1 - 9 Jan 2024"
+    const debutSemaine = formatDateSimple(currentWeekStart); // Exemple: "1 Jan"
+    const finSemaine = formatDateSimple(weekEnd); // Exemple: "9 Jan"
+    const annee = currentWeekStart.getFullYear(); // Exemple: "2024"
+
+    document.getElementById('currentWeek').textContent = `${debutSemaine} - ${finSemaine} ${annee}`;
 }
 
-// Formate une date au format JJ/MM/AAAA
+// Fonction pour formater la date en "1 Jan"
+function formatDateSimple(date) {
+    const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+    const mois = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc"];
+    let jourMois = date.getDate();
+    let moisAnnee = mois[date.getMonth()];
+    return `${jourMois} ${moisAnnee}`;
+}
+
+// Tableau des jours de la semaine en français
+const jours = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+// Modifiez la fonction formatDate pour utiliser le format souhaité
 function formatDate(date) {
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    let jour = jours[date.getDay()];
+    let jourMois = date.getDate();
+    return `${jour} ${jourMois}`;
 }
 
 // Charge les données depuis Firebase
@@ -52,60 +81,63 @@ function updateTables(users, events) {
 function updateBedsTable(events) {
     const bedsTable = document.getElementById('bedsTable');
     bedsTable.innerHTML = '';
-    createBedsTableHalf(bedsTable, events, 0, 4, true); // Première moitié avec en-tête (jusqu'au 4ème jour)
-    bedsTable.appendChild(document.createElement('br'));
-    createBedsTableHalf(bedsTable, events, 4, 9, false); // Deuxième moitié sans en-tête (à partir du 5ème jour)
+
+    // Créez le tableau en deux parties, avec un saut de ligne après le mardi
+    createBedsTableHalf(bedsTable, events, 0, 5); // De vendredi à mardi
+    bedsTable.appendChild(document.createElement('br')); // Saut de ligne
+    createBedsTableHalf(bedsTable, events, 5, 10); // De mercredi à dimanche suivant
 }
 
+
 // Crée une moitié du tableau des couchages
-function createBedsTableHalf(bedsTable, events, startDay, endDay, includeHeader) {
+function createBedsTableHalf(bedsTable, events, startDay, endDay, breakAfterTuesday = false) {
     const daysRow = document.createElement('tr');
     const nightsRow = document.createElement('tr');
-
-    if (includeHeader) {
-        daysRow.appendChild(createHeaderCell("Jours", '1'));
-        nightsRow.appendChild(createHeaderCell("Couchages", '1'));
-    }
 
     for (let i = startDay; i < endDay; i++) {
         const dayDate = new Date(currentWeekStart);
         dayDate.setDate(dayDate.getDate() + i);
         daysRow.appendChild(createDayCell(dayDate, '1'));
         nightsRow.appendChild(createNightCell(dayDate, events));
+
+        if (breakAfterTuesday && i === 2) { // Mardi est le 3ème jour à partir de vendredi
+            bedsTable.appendChild(daysRow);
+            bedsTable.appendChild(nightsRow);
+            bedsTable.appendChild(document.createElement('br')); // Saut de ligne après mardi
+            daysRow = document.createElement('tr');
+            nightsRow = document.createElement('tr');
+        }
     }
 
     bedsTable.appendChild(daysRow);
     bedsTable.appendChild(nightsRow);
 }
 
+
 // Met à jour le tableau des repas
 function updateMealsTable(events) {
     const mealsTable = document.getElementById('mealsTable');
     mealsTable.innerHTML = '';
-    createMealsTableHalf(mealsTable, events, 0, 4, true); // Première moitié avec en-tête
-    mealsTable.appendChild(document.createElement('br'));
-    createMealsTableHalf(mealsTable, events, 4, 9, false); // Deuxième moitié sans en-tête
+
+    // Créez le tableau en deux parties, avec un saut de ligne après le mardi
+    createMealsTableHalf(mealsTable, events, 0, 5); // De vendredi à mardi
+    mealsTable.appendChild(document.createElement('br')); // Saut de ligne
+    createMealsTableHalf(mealsTable, events, 5, 10); // De mercredi à dimanche suivant
 }
 
 // Crée une moitié du tableau des repas
-function createMealsTableHalf(mealsTable, events, startDay, endDay, includeHeader) {
+function createMealsTableHalf(mealsTable, events, startDay, endDay) {
     const daysRow = document.createElement('tr');
     const mealTypesRow = document.createElement('tr');
     const mealsCountRow = document.createElement('tr');
-
-    if (includeHeader) {
-        daysRow.appendChild(createHeaderCell("Jours", '2'));
-        mealTypesRow.appendChild(createHeaderCell("Repas", '2'));
-        mealsCountRow.appendChild(createHeaderCell("Convives", '2'));
-    }
 
     for (let i = startDay; i < endDay; i++) {
         const dayDate = new Date(currentWeekStart);
         dayDate.setDate(dayDate.getDate() + i);
         daysRow.appendChild(createDayCell(dayDate, '2'));
 
-        mealTypesRow.appendChild(createMealTypeCell('Déjeuner'));
-        mealTypesRow.appendChild(createMealTypeCell('Dîner'));
+        mealTypesRow.appendChild(createMealTypeCell('Déj'));
+        mealTypesRow.appendChild(createMealTypeCell('Dîn'));
 
         mealsCountRow.appendChild(createMealsCountCell(dayDate, events, 'dejeuner'));
         mealsCountRow.appendChild(createMealsCountCell(dayDate, events, 'diner'));

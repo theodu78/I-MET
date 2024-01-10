@@ -42,9 +42,8 @@ async function loadUserInfo(userId) {
     if (userSnap.exists()) {
         const userData = userSnap.data();
         document.getElementById('userInfo').innerHTML = `
-            <p>Nom: ${userData.Name}</p>
-            <p>Année de naissance: ${userData.Year}</p>
-            <p>Actif: ${userData.actif}</p>
+            <p>   ${userData.Name}</p>
+
         `;
     } else {
         console.log('No such user!');
@@ -72,6 +71,30 @@ async function loadLastFourStays(userId) {
     });
 }
 
-const userId = 'FhwaDimVF9oOmf5QyE5X';
-loadUserInfo(userId);
-loadLastFourStays(userId);
+function init() {
+    // Récupération de l'ID de l'utilisateur depuis sessionStorage
+    const userId = sessionStorage.getItem('userId');
+    if (userId) {
+        // Chargement des informations de l'utilisateur et des séjours
+        loadUserInfo(userId);
+        loadLastFourStays(userId);
+    } else {
+        console.log('ID utilisateur non trouvé dans sessionStorage');
+    }
+
+    // Affichage du nom de l'utilisateur
+    const userName = sessionStorage.getItem('userName');
+    if (userName) {
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        if (userNameDisplay) {
+            userNameDisplay.textContent = userName;
+        } else {
+            console.log('Élément pour afficher le nom de l\'utilisateur non trouvé.');
+        }
+    } else {
+        console.log('Le nom de l\'utilisateur n\'est pas défini dans sessionStorage.');
+    }
+}
+
+// Lancer l'initialisation une fois que le DOM est chargé
+document.addEventListener('DOMContentLoaded', init);

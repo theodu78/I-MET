@@ -1,7 +1,8 @@
 body {
     font-family: Helvetica, sans-serif, sans-serif;
     margin: 0;
-    padding: 0;
+    padding: 0 3px;
+    margin-top: 0 !important; /* Supprime tout espace en haut de la page */
     box-sizing: border-box; /* Assure une meilleure gestion de la largeur */
 }
 
@@ -43,6 +44,24 @@ body {
     margin-bottom: 0px;
     background-color: #086edb; /* Couleur de fond spécifique pour ce bouton */
 }
+
+#declarerSejour {
+    display: block; /* Rendre le bouton en tant qu'élément de bloc */
+    width: 60%; /* Largeur du bouton (ajustez selon vos besoins) */
+    margin: 20px auto; /* Centrer horizontalement avec une marge de 20px en haut et en bas */
+    padding: 12px 0; /* Padding vertical pour augmenter la hauteur du bouton */
+    font-size: 1.2rem; /* Taille de la police du bouton */
+    background-color: #086edb; /* Couleur de fond du bouton */
+    color: white; /* Couleur du texte */
+    border: none; /* Pas de bordure */
+    border-radius: 20px; /* Bordures arrondies */
+    cursor: pointer; /* Style de curseur pour indiquer qu'il s'agit d'un bouton cliquable */
+}
+
+#retourMois {
+    background-color: #343a40; /* Gris foncé */
+}
+
 
 #btnSupprimer {
     background-color: #dc3545; /* Couleur de fond rouge pour le bouton supprimer */
@@ -157,9 +176,10 @@ label {
 }
 
 table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 20px;
+    width: 100%; /* Utilisez la largeur totale disponible */
+    border-collapse: collapse; /* Fusionner les bordures des cellules */
+    table-layout: fixed; /* Fixer la disposition du tableau */
+    font-size: 13px; /* Ajustez la taille selon vos besoins */
 }
 
 table, th, td {
@@ -169,7 +189,11 @@ table, th, td {
 th, td {
     padding: 8px;
     text-align: center;
+    border: 1px solid #ddd; /* Bordure des cellules */
+    overflow: hidden; /* Masquer le contenu débordant */
+    word-wrap: break-word; /* Casser les mots trop longs pour éviter le débordement */
 }
+
 
 th {
     background-color: #f2f2f2;
@@ -183,6 +207,32 @@ th {
     background-color: rgb(151, 151, 243);
     color: white;
 }
+
+#navigation {
+    text-align: center;
+}
+
+#navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px; /* Espace entre les boutons et les détails de la semaine */
+}
+
+#week-details {
+    text-align: left; /* Aligner les détails de la semaine à gauche */
+}
+
+#prevWeek {
+    float: left;
+}
+
+#nextWeek {
+    float: right;
+}
+
+
+
+
 /* Styles adaptés pour les smartphones */
 @media (max-width: 768px) {
 
@@ -253,4 +303,18 @@ th {
         font-size: 22px; /* Taille de police plus grande pour les liens */
         padding: 15px 20px; /* Plus de padding pour les liens */
     }
+
+    .mealsSection table, .bedsSection table {
+        min-width: 768px; /* Assurer un minimum de largeur pour le tableau */
+    }
+
+    .mealsSection, .bedsSection {
+        overflow-x: auto; /* Permettre le défilement horizontal si nécessaire */
+    }
+
+    #declarerSejour {
+        width: 80%; /* Largeur plus grande sur les écrans plus petits */
+        font-size: 1rem; /* Taille de la police ajustée pour les écrans plus petits */
+    }
+
 }
