@@ -31,53 +31,43 @@ document.addEventListener('DOMContentLoaded', function() {
         height: 'auto', 
         events: fetchEvents,
         dateClick: function(info) {
-            selectedDate = info.dateStr; // Update selectedDate on date click
-            calendar.changeView('listWeek', info.dateStr);
-            document.getElementById('retourMois').style.display = 'block';
-
+            if (calendar.view.type === 'dayGridMonth') {
+                calendar.changeView('listWeek', info.dateStr);
+                document.getElementById('retourMois').style.display = 'block';
+            }
         },
+
         eventClick: function(info) {
-            if (calendar.view.type === 'listWeek') {
-                const eventId = info.event.id;
-                const eventRef = doc(db, "Events", eventId);
-                getDoc(eventRef).then((docSnap) => {
-                    if (docSnap.exists()) {
-                        chargerEvenementPourModification(info.event, docSnap.data());
-                    } else {
-                        alert("Cet événement a été supprimé.");
-                        calendar.refetchEvents();
-                    }
-                });
-            } else {
-                // Dans la vue dayGridMonth, change simplement la vue en listWeek
+            if (calendar.view.type === 'dayGridMonth') {
                 calendar.changeView('listWeek', info.event.start);
                 document.getElementById('retourMois').style.display = 'block';
             }
         },
-        
+
         windowResize: function(view) {
             if (window.innerWidth < 768) {
                 calendar.changeView('listWeek');
+                document.getElementById('retourMois').style.display = 'block';
             } else {
                 calendar.changeView('dayGridMonth');
+                document.getElementById('retourMois').style.display = 'none';
             }
         }
     });
 
     calendar.render();
     chargerListeParticipants();
+});
 
-    document.getElementById('retourMois').addEventListener('click', function() {
-        calendar.changeView('dayGridMonth');
-        this.style.display = 'none';
-        selectedDate = new Date().toISOString().split('T')[0]; // Réinitialiser selectedDate à la date d'aujourd'hui
-    });
-
+// Gestionnaire pour le bouton de retour au mois
+document.getElementById('retourMois').addEventListener('click', function() {
+    calendar.changeView('dayGridMonth');
+    this.style.display = 'none';
+});
     document.getElementById('declarerSejour').addEventListener('click', function() {
         ouvrirModal(true); // Ouvrir le modal pour un nouvel événement
     });
-});
-
+    
 // Fonction pour récupérer les noms des participants à partir des ID
 async function getParticipantNames(participantIds) {
     const usersCol = collection(db, 'Users');
@@ -408,6 +398,7 @@ async function displayUserName() {
         }
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
     displayUserName();

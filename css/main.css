@@ -3,7 +3,6 @@ body {
     margin: 0;
     padding: 0 3px;
     margin-top: 0 !important; /* Supprime tout espace en haut de la page */
-    box-sizing: border-box; /* Assure une meilleure gestion de la largeur */
 }
 
 #calendar {
@@ -62,7 +61,6 @@ body {
     background-color: #343a40; /* Gris foncé */
 }
 
-
 #btnSupprimer {
     background-color: #dc3545; /* Couleur de fond rouge pour le bouton supprimer */
     color: white;
@@ -110,6 +108,7 @@ label {
 label {
     display: block;
     margin-bottom: 5px;
+    
 }
 
 /* Style pour la modal */
@@ -126,18 +125,18 @@ label {
     display: flex;
     align-items: center; /* Centre verticalement */
     justify-content: center; /* Centre horizontalement */
+
 }
 
 .modal-content {
     position: relative;
     background-color: #fefefe;
-    margin: 5% auto; /* Centrage horizontal */
     padding: 20px;
     border: 1px solid #888;
-    width: 50%; /* Largeur de la modal */
-    transform: translateY(-50%); /* Centrage vertical */
-    top: 40%;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); /* Ombre pour la mise en avant */
+    width: 80%; /* Ajustez la largeur pour les petits écrans */
+    max-height: 80vh; /* Définissez une hauteur maximale */
+    overflow-y: auto; /* Permettre le défilement vertical */
+    border-radius: 20px; /* Coins arrondis */
 }
 .close {
     color: #aaa;
@@ -189,11 +188,7 @@ table, th, td {
 th, td {
     padding: 8px;
     text-align: center;
-    border: 1px solid #ddd; /* Bordure des cellules */
-    overflow: hidden; /* Masquer le contenu débordant */
-    word-wrap: break-word; /* Casser les mots trop longs pour éviter le débordement */
 }
-
 
 th {
     background-color: #f2f2f2;
@@ -231,6 +226,24 @@ th {
 }
 
 
+/* Style pour l'écran de chargement */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1e2838; /* ou toute autre couleur de fond souhaitée */
+    z-index: 9999; /* Assure que l'écran de chargement est au-dessus de tout autre contenu */
+    display: flex;
+    justify-content: center; /* Centre le logo horizontalement */
+    align-items: center; /* Centre le logo verticalement */
+  }
+  
+  /* Style pour le logo lors du chargement */
+  .loading-logo {
+    max-width: 100px; /* Ajustez la taille de votre logo */
+  }
 
 
 /* Styles adaptés pour les smartphones */
@@ -263,13 +276,11 @@ th {
     }
 
     .modal-content {
-        width: 90%; /* Largeur adaptée pour les petits écrans */
-        margin: auto; /* Ajustement de la marge pour centrer verticalement */
-        padding: 20px; /* Padding réduit pour les petits écrans */
-        border-radius: 10px; /* Ajoutez des coins arrondis */
-        overflow: hidden; /* Pour assurer que le contenu ne dépasse pas des coins arrondis */
-        padding: 20px; /* Ajustez le padding comme nécessaire */
+        width: 90%; /* Augmentez la largeur sur les petits écrans */
+        max-height: 80vh; /* Hauteur maximale pour s'assurer que le contenu ne dépasse pas l'écran */
+        overflow-y: auto; /* Activer le défilement si nécessaire */
     }
+    
 
     /* Réduction de la taille des boutons pour qu'ils s'adaptent mieux aux petits écrans */
     #familyTree button, #btnAjouterParticipants {
@@ -317,4 +328,5 @@ th {
         font-size: 1rem; /* Taille de la police ajustée pour les écrans plus petits */
     }
 
+    
 }

@@ -79,3 +79,12 @@ window.onload = async function() {
     const users = await loadUsers();
     familyTree.appendChild(generateFamilyTree(users));
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      document.getElementById('loadingScreen').style.display = 'none';
+    }, 1000); // Cette fonction masquera l'écran de chargement après 1 seconde (1000 millisecondes)
+  });
+  
+
+  

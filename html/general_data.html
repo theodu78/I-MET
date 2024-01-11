@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1e2838">
+    <title>Informations - I MET</title>
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/navbar.css">
 </head>
@@ -18,9 +18,6 @@
         <a href="calendar.html">Calendar</a>
         <a href="beds_meals.html">Beds & Meals</a>
         <a href="general_data.html">General Data</a>
-    </div>
-    <div id="userInfo">
-        <!-- Informations de l'utilisateur seront affichées ici -->
     </div>
     
     <h2>4 derniers Séjours</h2>
@@ -39,16 +36,28 @@
     <script src="../js/firebaseConfig.js" type="module"></script>
     <script src="../js/general_data.js" type="module"></script>
     <script>
-        window.onload = function() {
-            // Display user's name from session storage
-            const userName = sessionStorage.getItem('userName');
-            document.getElementById('userNameDisplay').textContent = userName;
-        };
-    
-        function toggleMenu() {
+       function toggleMenu() {
             const menu = document.getElementById('menu');
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         }
+    
+        // Gestionnaire d'événements pour fermer le menu lors d'un clic en dehors
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('menu');
+            const menuButton = document.querySelector('.menu-button');
+    
+            // Vérifiez si le menu est ouvert et si le clic est en dehors du menu et du bouton
+            if (menu.style.display === 'block' && !menu.contains(event.target) && event.target !== menuButton) {
+                menu.style.display = 'none';
+            }
+        });
+    
+        window.onload = function() {
+            // Afficher le nom de l'utilisateur depuis le sessionStorage
+            const userName = sessionStorage.getItem('userName');
+            document.getElementById('userNameDisplay').textContent = userName;
+        };
     </script>
+    
 </body>
 </html>

@@ -76,7 +76,6 @@ function init() {
     const userId = sessionStorage.getItem('userId');
     if (userId) {
         // Chargement des informations de l'utilisateur et des séjours
-        loadUserInfo(userId);
         loadLastFourStays(userId);
     } else {
         console.log('ID utilisateur non trouvé dans sessionStorage');
@@ -95,6 +94,34 @@ function init() {
         console.log('Le nom de l\'utilisateur n\'est pas défini dans sessionStorage.');
     }
 }
+
+async function fetchUserName(userId) {
+    if (!userId) return;
+
+    try {
+        const userRef = doc(db, 'Users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            return userData.Name; // Supposons que le champ pour le nom d'utilisateur est 'Name'
+        } else {
+            console.log('Utilisateur non trouvé');
+            return '';
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération des informations de l\'utilisateur:', error);
+        return '';
+    }
+}
+
+window.onload = async function() {
+    const userId = sessionStorage.getItem('userId');
+    const userName = await fetchUserName(userId);
+    document.getElementById('userNameDisplay').textContent = userName;
+
+    // Reste du code...
+};
 
 // Lancer l'initialisation une fois que le DOM est chargé
 document.addEventListener('DOMContentLoaded', init);

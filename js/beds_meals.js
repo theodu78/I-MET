@@ -1,6 +1,6 @@
 // Importation des modules Firebase nécessaires
 import { db } from './firebaseConfig.js';
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { collection, query, where, getDocs, orderBy, limit, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Variables globales
 let currentWeekStart;
@@ -9,6 +9,9 @@ let currentWeekStart;
 window.addEventListener('load', () => {
     initializeWeek();
     loadData();
+
+    // Ajouter un code de débogage pour afficher l'ID de l'utilisateur dans la console
+    console.log("ID de l'utilisateur en sessionStorage:", sessionStorage.getItem('userId'));
 });
 
 // Initialise la semaine courante à partir du jour actuel, avec le début de la semaine fixé au vendredi
@@ -247,4 +250,33 @@ document.getElementById('nextWeek').addEventListener('click', () => {
     loadData();
 });
 
+const userId = sessionStorage.getItem('userId');
+
+async function fetchUserName(userId) {
+    if (!userId) return;
+
+    try {
+        const userRef = doc(db, 'Users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            return userData.Name; // Supposons que le champ pour le nom d'utilisateur est 'Name'
+        } else {
+            console.log('Utilisateur non trouvé');
+            return '';
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération des informations de l\'utilisateur:', error);
+        return '';
+    }
+}
+
+window.onload = async function() {
+    const userId = sessionStorage.getItem('userId');
+    const userName = await fetchUserName(userId);
+    document.getElementById('userNameDisplay').textContent = userName;
+
+    // Reste du code...
+};
 
