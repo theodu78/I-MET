@@ -81,6 +81,19 @@ window.onload = async function() {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Commencez à remplir la barre de chargement
+    var progressBarFill = document.querySelector('.progress-bar-fill');
+    progressBarFill.style.width = '100%'; // Remplissage complet
+  
+    // Masquez l'écran de chargement après 1 seconde
+    setTimeout(function() {
+      document.getElementById('loadingScreen').style.display = 'none';
+    }, 1000);
+  });
+  
+
+
+document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
       document.getElementById('loadingScreen').style.display = 'none';
     }, 1000); // Cette fonction masquera l'écran de chargement après 1 seconde (1000 millisecondes)

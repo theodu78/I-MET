@@ -236,15 +236,41 @@ th {
     background-color: #1e2838; /* ou toute autre couleur de fond souhaitée */
     z-index: 9999; /* Assure que l'écran de chargement est au-dessus de tout autre contenu */
     display: flex;
+    flex-direction: column; /* Organise les éléments en colonne */
     justify-content: center; /* Centre le logo horizontalement */
     align-items: center; /* Centre le logo verticalement */
   }
   
-  /* Style pour le logo lors du chargement */
   .loading-logo {
-    max-width: 100px; /* Ajustez la taille de votre logo */
-  }
+    max-width: 300px;
+    margin-bottom: 10px; /* Ajoute de l'espace entre le logo et la barre de progression */
+}
 
+  /* Style pour la barre de chargement */
+.progress-bar {
+    width: 40%; /* Ou la largeur que vous souhaitez pour la barre de chargement */
+    height: 20px; /* Hauteur de la barre de chargement */
+    background-color: #1e2838; /* Couleur de fond de la barre de chargement */
+    border-radius: 10px; /* Coins arrondis pour la barre de chargement */
+    overflow: hidden; /* Permet de garder le remplissage interne arrondi */
+    margin-top: 10px; /* Espace au-dessus de la barre de chargement */
+    border: 2px solid #ddd
+
+  }
+  
+  /* Style pour le remplissage de la barre de chargement */
+  .progress-bar-fill {
+    display: block;
+    height: 100%;
+    width: 0%; /* Commence sans remplissage */
+    background-color: #ddd; /* Couleur du remplissage de la barre de chargement */
+    transition: width 1s ease-in-out; /* Animation de remplissage */
+    border-radius: 10px; /* Coins arrondis pour le remplissage */
+    box-sizing:border-box;
+    border: 2px;
+
+  }
+  
 
 /* Styles adaptés pour les smartphones */
 @media (max-width: 768px) {
