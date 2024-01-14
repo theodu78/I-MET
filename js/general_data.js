@@ -88,6 +88,36 @@ async function loadLastFourStays(userId) {
     document.body.appendChild(pqElement);
 }
 
+// Fonction pour calculer et afficher les informations de cotisation
+async function displayCotisations() {
+    const year = new Date().getFullYear(); // Récupérer l'année en cours
+    let cotisationAnnee = 0;
+    let cotisationGlobale = 0;
+
+    const eventsCol = collection(db, 'Events');
+    const eventSnapshot = await getDocs(eventsCol);
+    
+    eventSnapshot.forEach(doc => {
+        const event = doc.data();
+        const montant = calculateAmount(event);
+        const dateDebut = new Date(event.dateDebut);
+
+        cotisationGlobale += montant;
+        if (dateDebut.getFullYear() === year) {
+            cotisationAnnee += montant;
+        }
+    });
+
+    // Création et affichage des informations de cotisation
+    const cotisationInfo = document.createElement('div');
+    cotisationInfo.innerHTML = `
+        <h3>Général :</h3>
+        <p>Cotisation (${year}) : ${cotisationAnnee.toFixed(2)} €</p>
+        <p>Cotisation globale : ${cotisationGlobale.toFixed(2)} €</p>
+    `;
+    document.body.appendChild(cotisationInfo);
+}
+
 
 function init() {
     // Récupération de l'ID de l'utilisateur depuis sessionStorage
@@ -110,6 +140,9 @@ function init() {
         }
     } else {
         console.log('Le nom de l\'utilisateur n\'est pas défini dans sessionStorage.');
+
+        displayCotisations();
+
     }
 
 }
