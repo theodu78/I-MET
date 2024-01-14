@@ -59,6 +59,8 @@ async function loadLastFourStays(userId) {
     const sejourTable = document.getElementById('sejourTable').getElementsByTagName('tbody')[0];
     sejourTable.innerHTML = ''; // Clear previous entries
 
+    let totalHours = 0; // Total des heures passées
+ 
     eventSnapshot.forEach(doc => {
         const event = doc.data();
         const amount = calculateAmount(event);
@@ -68,8 +70,24 @@ async function loadLastFourStays(userId) {
         // Utiliser formatDate pour formater les dates
         cell1.textContent = `${formatDate(new Date(event.dateDebut))} - ${formatDate(new Date(event.dateFin))}`;
         cell2.textContent = `€${amount}`;
+
+            // Calculer la durée totale en heures
+    const start = new Date(event.dateDebut);
+    const end = new Date(event.dateFin);
+    const duration = (end - start) / 3600000; // Convertir les millisecondes en heures
+    totalHours += duration;
+
     });
+
+
+    let indicePQ = totalHours > 0 ? 50 * Math.log(totalHours * 1.8) - 185 : 10;
+
+    // Créer et afficher l'élément pour l'Indice PQ
+    const pqElement = document.createElement('p');
+    pqElement.textContent = `Indice PQ : ${(totalHours > 0 ? 50 * Math.log(totalHours * 1.8) - 185 : 10).toFixed(2)} m`;
+    document.body.appendChild(pqElement);
 }
+
 
 function init() {
     // Récupération de l'ID de l'utilisateur depuis sessionStorage
@@ -93,6 +111,7 @@ function init() {
     } else {
         console.log('Le nom de l\'utilisateur n\'est pas défini dans sessionStorage.');
     }
+
 }
 
 async function fetchUserName(userId) {
@@ -122,6 +141,9 @@ window.onload = async function() {
 
     // Reste du code...
 };
+
+
+
 
 // Lancer l'initialisation une fois que le DOM est chargé
 document.addEventListener('DOMContentLoaded', init);
