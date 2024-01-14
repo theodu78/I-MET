@@ -6,6 +6,9 @@
     color: white;
     padding-top: 0;
     margin: 0;
+    left: -3px; /* Annuler le padding gauche de 3px appliqué au body */
+    right: -3px; /* Annuler le padding droit de 3px appliqué au body */
+    width: calc(100% + 6px); /* Ajuster la largeur pour prendre en compte le padding */
 }
 
 /* Style pour le logo dans la barre de navigation */
@@ -13,6 +16,15 @@
     height: 40px; /* ou la taille souhaitée */
     width: auto; /* pour conserver les proportions */
     display: block; /* pour supprimer les marges indésirables autour de l'image */
+}
+
+#userNameDisplay {
+    font-size: 1.4rem; /* Taille de la police, ajustez selon vos besoins */
+    font-family: Helvetica, sans-serif; /* Style de police, modifiez selon vos préférences */
+    margin-left: 10px; /* Marge sur le côté droit */
+    color: white; /* Couleur du texte, ajustez selon le thème de votre barre de navigation */
+    font-weight: bold; /* Rendre le texte en gras */
+    text-align: center; /* Centrer le texte */
 }
 
 /* Style pour le bouton de menu dans la barre de navigation */
@@ -23,11 +35,6 @@
     font-size: 1rem;
     cursor: pointer;
     margin-left: auto; /* Pousse le bouton vers la droite */
-}
-
-/* Style pour le corps - ajustez en fonction de la hauteur de votre barre de navigation */
-body {
-    margin-top: 50px; /* Ajustez cette valeur en fonction de la hauteur de votre barre de navigation */
 }
 
 /* Styles pour le menu déroulant */
@@ -56,12 +63,21 @@ body {
 
 /* Ajout de règles médias pour les smartphones */
 @media (max-width: 768px) {
-    /* Réduire la hauteur de la barre de navigation et la taille du logo */
-    .top-nav {
-        padding: 0;
-        padding-top: 0;
+
+    body {
+        font-size: 18px; /* ou plus grand si nécessaire */
+        padding-top: 5px;
     }
 
+    .top-nav {
+        position: fixed; /* Positionne la barre de navigation de manière fixe en haut de la page */
+        top: 0;
+        left: 0; /* Commencez à partir de l'extrémité gauche de la page */
+        right: 0; /* Étendez-vous jusqu'à l'extrémité droite de la page */
+        width: 100%; /* La largeur occupera toute la largeur de l'écran */
+        z-index: 1000; /* S'assure que la barre de navigation reste au-dessus des autres éléments */
+        /* Autres styles nécessaires pour la barre de navigation */
+    }
     .logo-img {
         height: 4rem ; /* une taille plus petite pour les écrans mobiles */
         padding: 5px

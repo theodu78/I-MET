@@ -1,8 +1,8 @@
 body {
-    font-family: Helvetica, sans-serif, sans-serif;
+    font-family: Helvetica, sans-serif;
     margin: 0;
     padding: 0 3px;
-    margin-top: 0 !important; /* Supprime tout espace en haut de la page */
+    margin-top: 100px !important; /* Supprime tout espace en haut de la page */
 }
 
 #calendar {
@@ -196,10 +196,11 @@ th {
 #familyTree button {
     display: block;
     width: 20%;
+    margin: 10px auto;
 }
 
 .clicked {
-    background-color: rgb(151, 151, 243);
+    background-color: rgb(216, 138, 65);
     color: white;
 }
 
@@ -292,6 +293,24 @@ th {
 
     body {
         font-size: 18px; /* ou plus grand si nécessaire */
+        padding-top: 50px;
+    }
+
+    body.index-page {
+        padding-top: 0px; /* Exemple : annuler le padding-top */
+        background-color: #1e2838;
+        color: #ddd;
+        margin: 10px auto;
+        font-family: Helvetica, sans-serif; /* Utiliser Helvetica comme police principale */
+        background-image: linear-gradient(to right, #151b25,#223553 ); /* Dégradé de bleu */
+    }
+
+    body.index-page h2 {
+        text-align: center; /* Centrer le texte */
+        color: white; /* Couleur du texte */
+        font-weight: bold;
+    }
+
     }
 
     #calendar {
@@ -370,6 +389,4 @@ th {
         width: 80%; /* Largeur plus grande sur les écrans plus petits */
         font-size: 1rem; /* Taille de la police ajustée pour les écrans plus petits */
     }
-
     
-}
