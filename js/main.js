@@ -38,11 +38,17 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         eventClick: function(info) {
-            if (calendar.view.type === 'dayGridMonth') {
+            console.log("Event Clicked Data:", info.event); // Ajouter ce log
+            if (calendar.view.type === 'listWeek') {
+                // La vue est listWeek, alors ouvrez la modal pour modifier l'événement.
+                chargerEvenementPourModification(info.event, info.event.extendedProps);
+            } else {
+                // Sinon, changez la vue en listWeek.
                 calendar.changeView('listWeek', info.event.start);
                 document.getElementById('retourMois').style.display = 'block';
             }
         },
+        
 
         windowResize: function(view) {
             if (window.innerWidth < 768) {
@@ -75,8 +81,13 @@ async function getParticipantNames(participantIds) {
         participantIds.map(id => getDoc(doc(usersCol, id)))
     );
 
-    // Ajouter console.log ici pour déboguer
-    userSnapshots.forEach(snapshot => console.log(snapshot.data()));
+    userSnapshots.forEach(snapshot => {
+        if (snapshot.exists()) {
+            console.log("Participant Data:", snapshot.data());
+        } else {
+            console.log("No data found for ID:", snapshot.id);
+        }
+    });
 
     return userSnapshots.map(snapshot => snapshot.data()?.Name || 'Inconnu');
 }
@@ -134,22 +145,24 @@ function ouvrirModal(nouvelEvenement = false) {
 
 
 // Fonction pour charger un événement pour modification
-function chargerEvenementPourModification(event, eventData) {
+async function chargerEvenementPourModification(event, eventData) {
     document.getElementById('dateDebut').value = convertirDatePourAffichage(event.start.toISOString());
     document.getElementById('dateFin').value = event.end ? convertirDatePourAffichage(event.end.toISOString()) : convertirDatePourAffichage(event.start.toISOString());
     document.getElementById('presenceForm').dataset.eventId = event.id;
     document.getElementById('modalPopup').style.display = 'block';
     document.getElementById('selectedParticipantsList').innerHTML = '';
-    document.getElementById('btnSupprimer').style.display = 'block'; // Affichage du bouton Supprimer
+    document.getElementById('btnSupprimer').style.display = 'block';
 
     // Récupérer les participants existants pour cet événement
-    getParticipantNames(eventData.participants || []).then(participantNames => {
-        const participantsList = document.getElementById('selectedParticipantsList');
-        participantsList.innerHTML = participantNames.join('<br>');
-        document.getElementById('btnAjouterParticipants').dataset.currentParticipants = JSON.stringify(eventData.participants || []);
-    });
-}
+    const participantNames = await getParticipantNames(eventData.participants || []);
+    const participantsList = document.getElementById('selectedParticipantsList');
+    participantsList.innerHTML = participantNames.join('<br>');
+    document.getElementById('btnAjouterParticipants').dataset.currentParticipants = JSON.stringify(eventData.participants || []);
+    console.log("Event Data:", eventData);
 
+    // Charger la liste des participants avec les cases pré-cochées pour les participants existants
+    chargerListeParticipants(eventData.participants || []);
+}
 
 // Fonctions pour gérer les événements Firebase
 window.sauvegarderPresence = async function() {
@@ -213,7 +226,7 @@ window.fermerModal = function() {
 };
 
 // Fonction pour charger la liste des participants
-async function chargerListeParticipants() {
+async function chargerListeParticipants(selectedParticipantIds = []) {
     try {
         const usersCol = collection(db, 'Users');
         const userSnapshot = await getDocs(usersCol);
@@ -225,7 +238,6 @@ async function chargerListeParticipants() {
         const checkboxesContainer = document.getElementById('participantCheckboxes');
         checkboxesContainer.innerHTML = '';
 
-        const currentUser = sessionStorage.getItem('userId');
         userList.forEach((user) => {
             let checkboxContainer = document.createElement('div');
             checkboxContainer.className = 'participant-container';
@@ -233,22 +245,23 @@ async function chargerListeParticipants() {
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.id = `participant-${user.id}`;
-            checkbox.value = user.id; // Utilisez l'ID unique comme valeur
-            checkbox.className = 'participant-checkbox'; // Ajoutez une classe pour le style si nécessaire
+            checkbox.value = user.id;
+            checkbox.className = 'participant-checkbox';
 
             let label = document.createElement('label');
             label.htmlFor = `participant-${user.id}`;
-            label.textContent = user.Name; // Nom pour l'affichage
-            label.className = 'participant-label'; // Ajoutez une classe pour le style si nécessaire
+            label.textContent = user.Name;
+            label.className = 'participant-label';
 
-            if (user.id === currentUser) {
-                checkbox.checked = true; // Pré-sélectionnez la case à cocher pour l'utilisateur actuel
-            }
+            // Pré-cocher la checkbox si l'ID de l'utilisateur est dans selectedParticipantIds
+            checkbox.checked = selectedParticipantIds.includes(user.id);
 
             checkboxContainer.appendChild(checkbox);
             checkboxContainer.appendChild(label);
 
             checkboxesContainer.appendChild(checkboxContainer);
+
+            console.log(`User ID: ${user.id}, Checked: ${selectedParticipantIds.includes(user.id)}`);
         });
     } catch (error) {
         console.error("Erreur lors du chargement des utilisateurs: ", error);
@@ -258,11 +271,13 @@ async function chargerListeParticipants() {
 
 
 
+
 window.ouvrirChoixParticipants = function() {
     const modalChoixParticipants = document.getElementById('choixParticipants');
     if (modalChoixParticipants) {
         modalChoixParticipants.style.display = 'block';
-        chargerListeParticipants();
+        const currentParticipants = JSON.parse(document.getElementById('btnAjouterParticipants').dataset.currentParticipants || '[]');
+        chargerListeParticipants(currentParticipants);
     }
 };
 
@@ -271,6 +286,10 @@ window.fermerChoixParticipants = function() {
     if (modalChoixParticipants) {
         modalChoixParticipants.style.display = 'none';
     }
+    // Utiliser les participants actuels pour pré-cocher les cases
+    const currentParticipants = JSON.parse(document.getElementById('btnAjouterParticipants').dataset.currentParticipants || '[]');
+    chargerListeParticipants(currentParticipants);
+
 };
 
 window.validerSelectionParticipants = function() {

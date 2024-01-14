@@ -225,6 +225,21 @@ th {
     float: right;
 }
 
+/* CSS pour l'animation de grossissement */
+@keyframes animGrossissement {
+    from {
+        transform: scale(0.5);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.anim-grossissement {
+    animation: animGrossissement 0.5s ease-out;
+}
+
+
 
 /* Style pour l'écran de chargement */
 .loading-screen {
@@ -310,8 +325,9 @@ th {
 
     /* Réduction de la taille des boutons pour qu'ils s'adaptent mieux aux petits écrans */
     #familyTree button, #btnAjouterParticipants {
-        width: 100%;
-        font-size: 14px; /* Taille de police réduite pour un meilleur ajustement */
+        width: 80%;
+        margin: 10px auto;
+        font-size: 16px; /* Taille de police réduite pour un meilleur ajustement */
     }
 
     /* Adapter la taille du texte et des éléments de formulaire pour une meilleure lisibilité */
@@ -339,6 +355,7 @@ th {
     .menu a {
         font-size: 22px; /* Taille de police plus grande pour les liens */
         padding: 15px 20px; /* Plus de padding pour les liens */
+        background-color: #1e2838;
     }
 
     .mealsSection table, .bedsSection table {

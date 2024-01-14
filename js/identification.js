@@ -57,6 +57,7 @@ function confirmUserSelection(name, id) {
 function createFamilyButton(name, collapseId) {
     let button = document.createElement('button');
     button.textContent = name;
+    button.classList.add('anim-grossissement'); // Appliquer la classe d'animation
     button.style.display = 'block';
     return button;
 }
@@ -88,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Masquez l'écran de chargement après 1 seconde
     setTimeout(function() {
       document.getElementById('loadingScreen').style.display = 'none';
-    }, 1000);
+    }, 1500);
   });
   
 
