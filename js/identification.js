@@ -9,40 +9,46 @@ async function loadUsers() {
     const usersCol = collection(db, 'Users');
     const q = query(usersCol, where('actif', '==', 'true'));
     const userSnapshot = await getDocs(q);
-    return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
+    return userSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      year: doc.data().Year,
+      parent: doc.data().Parent
+    }));
+  }
 
 // Génère l'arbre généalogique de manière récursive
 function generateFamilyTree(users, parentID = "") {
-    let treeContainer = document.createElement('div'); 
-
-    users.filter(user => user.Parent === parentID).forEach(user => {
-        let userButton = createFamilyButton(user.Name, `collapseChildren${user.id}`);
-        treeContainer.appendChild(userButton);
-
-        let childrenContainer = document.createElement('div');
-        childrenContainer.id = `collapseChildren${user.id}`;
-        childrenContainer.className = 'collapse';
-        childrenContainer.style.display = 'none';
-        treeContainer.appendChild(childrenContainer);
-
-        userButton.onclick = function() {
-            if (!userButton.classList.contains('clicked')) {
-                resetButtonStyles();
-                userButton.classList.add('clicked');
-                if (childrenContainer.innerHTML === '') {
-                    let childrenTree = generateFamilyTree(users, user.id);
-                    childrenContainer.appendChild(childrenTree);
-                }
-                toggleCollapse(childrenContainer);
-            } else {
-                confirmUserSelection(user.Name, user.id);
-            }
-        };
+    let treeContainer = document.createElement('div');
+  
+    const sortedUsers = users.filter(user => user.Parent === parentID).sort((a, b) => a.year - b.year);
+    sortedUsers.forEach(user => {
+      let userButton = createFamilyButton(user.Name, `collapseChildren${user.id}`);
+      treeContainer.appendChild(userButton);
+  
+      let childrenContainer = document.createElement('div');
+      childrenContainer.id = `collapseChildren${user.id}`;
+      childrenContainer.className = 'collapse';
+      childrenContainer.style.display = 'none';
+      treeContainer.appendChild(childrenContainer);
+  
+      userButton.onclick = function() {
+        if (!userButton.classList.contains('clicked')) {
+          resetButtonStyles();
+          userButton.classList.add('clicked');
+          if (childrenContainer.innerHTML === '') {
+            let childrenTree = generateFamilyTree(users, user.id);
+            childrenContainer.appendChild(childrenTree);
+          }
+          toggleCollapse(childrenContainer);
+        } else {
+          confirmUserSelection(user.Name, user.id);
+        }
+      };
     });
-
+  
     return treeContainer;
-}
+  }
 
 // ... (fonction createFamilyButton)
 

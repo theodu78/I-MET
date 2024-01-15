@@ -50,7 +50,9 @@ body {
     margin: 20px auto; /* Centrer horizontalement avec une marge de 20px en haut et en bas */
     padding: 12px 0; /* Padding vertical pour augmenter la hauteur du bouton */
     font-size: 1.2rem; /* Taille de la police du bouton */
-    background-color: #086edb; /* Couleur de fond du bouton */
+    background-image: linear-gradient(to right, #092b5e,#3869f1  );
+    background-size: 100% 100%;
+    background-position: right bottom;
     color: white; /* Couleur du texte */
     border: none; /* Pas de bordure */
     border-radius: 20px; /* Bordures arrondies */
