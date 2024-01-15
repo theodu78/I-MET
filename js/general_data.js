@@ -3,7 +3,7 @@ import { collection, query, where, getDocs, orderBy, limit, doc, getDoc } from '
 
 // Fonction modifiée pour formater une date au format DD/MM
 function formatDate(date) {
-    return `${('0' + date.getDate()).slice(-2)}/${('0' + (date.getMonth() + 1)).slice(-2)}`;
+    return `${('0' + date.getDate()).slice(-2)}/${('0' + (date.getMonth() + 1)).slice(-2)}/${date.getFullYear()}`;
 }
 
 // Fonction pour calculer le montant d'un séjour
@@ -141,7 +141,7 @@ function init() {
     } else {
         console.log('Le nom de l\'utilisateur n\'est pas défini dans sessionStorage.');
 
-        displayCotisations();
+        
 
     }
 
