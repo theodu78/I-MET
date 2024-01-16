@@ -86,6 +86,9 @@ async function loadLastFourStays(userId) {
     const pqElement = document.createElement('p');
     pqElement.textContent = `Indice PQ : ${(totalHours > 0 ? 50 * Math.log(totalHours * 1.8) - 185 : 10).toFixed(2)} m`;
     document.body.appendChild(pqElement);
+
+    // Appeler la fonction displayCotisations à la fin
+    await displayCotisations();
 }
 
 // Fonction pour calculer et afficher les informations de cotisation

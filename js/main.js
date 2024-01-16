@@ -75,21 +75,19 @@ document.getElementById('retourMois').addEventListener('click', function() {
     });
     
 // Fonction pour récupérer les noms des participants à partir des ID
-async function getParticipantNames(participantIds) {
+async function getParticipantNames(participantIds, isConvives = false) {
     const usersCol = collection(db, 'Users');
     const userSnapshots = await Promise.all(
         participantIds.map(id => getDoc(doc(usersCol, id)))
     );
 
-    userSnapshots.forEach(snapshot => {
-        if (snapshot.exists()) {
-            console.log("Participant Data:", snapshot.data());
-        } else {
-            console.log("No data found for ID:", snapshot.id);
-        }
-    });
+    const participantNames = userSnapshots.map(snapshot => snapshot.data()?.Name || 'Inconnu');
 
-    return userSnapshots.map(snapshot => snapshot.data()?.Name || 'Inconnu');
+    if (isConvives) {
+        return participantNames.length;
+    }
+
+    return participantNames;
 }
 
 // Fonction pour récupérer les événements
@@ -99,10 +97,16 @@ async function fetchEvents(fetchInfo, successCallback, failureCallback) {
         const eventSnapshot = await getDocs(eventsCol);
         const events = await Promise.all(eventSnapshot.docs.map(async (doc) => {
             const data = doc.data();
-            const participantNames = await getParticipantNames(data.participants || []);
+            let participantNames;
+            if (data.participants.includes('Convives')) {
+                const participantCount = await getParticipantNames(data.participants, true);
+                participantNames = [`Convives (${participantCount})`];
+            } else {
+                participantNames = await getParticipantNames(data.participants);
+            }
             return {
                 id: doc.id,
-                title: participantNames.join(' / '), // Affiche les noms séparés par ' / '
+                title: participantNames.join(' / '),
                 start: data.dateDebut,
                 end: data.dateFin,
                 allDay: false
@@ -176,11 +180,20 @@ window.sauvegarderPresence = async function() {
     var participants = Array.from(document.querySelectorAll('#participantCheckboxes input[type=checkbox]:checked')).map(cb => cb.value);
     var participants = JSON.parse(document.getElementById('btnAjouterParticipants').dataset.currentParticipants || '[]');
 
+    var nombreConvives = parseInt(document.getElementById('btnAjouterParticipants').dataset.conviveCount || "0");
+    var nombreParticipants = participants.length;
+    
+    // Vérifier si "Convives" est dans la liste des participants et ajuster le nombre de participants
+    if (participants.includes('UsIflgeZTlY14aHVx6uN')) {
+        nombreParticipants--; // Soustraire 1 pour "Convives"
+    }
+    nombreParticipants += nombreConvives; // Ajouter le nombre réel de convives
+
     var eventData = {
         dateDebut,
         dateFin,
         participants,
-        nombreParticipants: participants.length
+        nombreParticipants
     };
 
     try {
@@ -255,7 +268,15 @@ async function chargerListeParticipants(selectedParticipantIds = []) {
 
             // Pré-cocher la checkbox si l'ID de l'utilisateur est dans selectedParticipantIds
             checkbox.checked = selectedParticipantIds.includes(user.id);
-
+          
+            if (user.id === 'UsIflgeZTlY14aHVx6uN') {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        demanderNombreConvives(user.id);
+                    }
+                });
+            }
+    
             checkboxContainer.appendChild(checkbox);
             checkboxContainer.appendChild(label);
 
@@ -269,7 +290,15 @@ async function chargerListeParticipants(selectedParticipantIds = []) {
 }
 
 
-
+function demanderNombreConvives(conviveId) {
+    let nombreConvives = prompt("Combien de convives ?", "1");
+    if (nombreConvives !== null) {
+        document.getElementById('btnAjouterParticipants').dataset.conviveCount = nombreConvives;
+    } else {
+        // Décocher la checkbox du convive si l'utilisateur annule
+        document.getElementById(`participant-${conviveId}`).checked = false;
+    }
+}
 
 
 window.ouvrirChoixParticipants = function() {
@@ -418,6 +447,29 @@ async function displayUserName() {
     }
 }
 
+function handleConvivesCheckboxChange(checkbox, participantCount) {
+    if (checkbox.checked) {
+        // Afficher le compte des participants lorsque la case à cocher "Convives" est cochée
+        displayParticipantCount(participantCount);
+    } else {
+        // Masquer le compte des participants lorsque la case à cocher "Convives" est décochée
+        hideParticipantCount();
+    }
+}
+
+function displayParticipantCount(count) {
+    const participantCountElement = document.createElement('span');
+    participantCountElement.textContent = `: ${count}`;
+    participantCountElement.id = 'participant-count';
+    document.getElementById('selectedParticipantsList').appendChild(participantCountElement);
+}
+
+function hideParticipantCount() {
+    const participantCountElement = document.getElementById('participant-count');
+    if (participantCountElement) {
+        participantCountElement.remove();
+    }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     displayUserName();
