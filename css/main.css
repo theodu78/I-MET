@@ -69,8 +69,14 @@ body {
 }
 .modal-buttons {
     display: flex;
-    justify-content: flex-end; /* Aligner les boutons à droite */
-    padding: 10px; /* Ajustez selon le besoin */
+    justify-content: space-between;
+    padding: 0px;
+}
+
+.modal-button {
+    flex: 1; /* Cela permettra à tous les boutons de croître et de remplir l'espace également */
+    margin: 10px; /* Ajoutez un peu d'espace entre les boutons */
+    /* Ajoutez d'autres styles de bouton ici */
 }
 
 
@@ -176,13 +182,12 @@ label {
     margin: 5px 0;
 }
 
-table {
+#mealsTable, #bedsTable, #sejourTable, #eventsTable {
     width: 100%; /* Utilisez la largeur totale disponible */
     border-collapse: collapse; /* Fusionner les bordures des cellules */
     table-layout: fixed; /* Fixer la disposition du tableau */
     font-size: 13px; /* Ajustez la taille selon vos besoins */
 }
-
 table, th, td {
     border: 1px solid black;
 }
@@ -195,6 +200,7 @@ th, td {
 th {
     background-color: #f2f2f2;
 }
+
 #familyTree button {
     display: block;
     width: 20%;
@@ -217,7 +223,11 @@ th {
 }
 
 #week-details {
-    text-align: left; /* Aligner les détails de la semaine à gauche */
+    display: flex; /* Utilisez Flexbox */
+    justify-content: center; /* Centre horizontalement */
+    align-items: center; /* Centre verticalement */
+    height: 4vh; /* Hauteur totale de la fenêtre de visualisation pour permettre le centrage vertical */
+    width: 100%; /* Utilisez toute la largeur disponible */
 }
 
 #prevWeek {
@@ -243,6 +253,14 @@ th {
 }
 
 
+#currentWeek {
+    font-size: 1.5rem; /* Taille de la police, ajustez selon vos besoins */
+    font-family: Helvetica, sans-serif; /* Style de police, modifiez selon vos préférences */
+    margin-left: 0px; /* Marge sur le côté droit */
+    color: #070707; /* Couleur du texte, ajustez selon le thème de votre barre de navigation */
+    font-weight: bold; /* Rendre le texte en gras */
+    text-align: center; /* Centrer le texte */
+}
 
 /* Style pour l'écran de chargement */
 .loading-screen {
@@ -251,7 +269,7 @@ th {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #1e2838; /* ou toute autre couleur de fond souhaitée */
+    background-image: linear-gradient(to right, #151b25,#223553 );
     z-index: 9999; /* Assure que l'écran de chargement est au-dessus de tout autre contenu */
     display: flex;
     flex-direction: column; /* Organise les éléments en colonne */
@@ -289,6 +307,20 @@ th {
 
   }
   
+
+  footer {
+    text-align: center; /* Centrer le contenu du footer */
+    font-style: italic; /* Texte en italique */
+    position: fixed; /* Fixe le footer en bas de la page */
+    bottom: 0; /* Positionne le footer tout en bas */
+    left: 0; /* Aligner à gauche */
+    width: 100%; /* Permet au footer d'occuper toute la largeur */
+    padding: 2px 0; /* Un peu de padding pour le design */
+    color: #656575;
+    font-weight: lighter;
+    font-size: 0.8rem;
+
+}
 
 /* Styles adaptés pour les smartphones */
 @media (max-width: 768px) {

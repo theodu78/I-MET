@@ -38,13 +38,13 @@ async function loadEvents() {
         const event = doc.data();
         const row = eventsTableBody.insertRow();
 
-        // Récupérer les noms des participants
-        const participantNames = await Promise.all(event.participants.map(userId => getUserName(userId)));
+        // Préparer le texte pour les participants
+        let participantText = await prepareParticipantText(event.participants, event.nombreParticipants);
 
         row.insertCell(0).textContent = doc.id;
         row.insertCell(1).textContent = formatDateTime(event.dateDebut);
         row.insertCell(2).textContent = formatDateTime(event.dateFin);
-        row.insertCell(3).textContent = participantNames.join(', ');
+        row.insertCell(3).textContent = participantText;
 
         const actionsCell = row.insertCell(4);
         const deleteButton = document.createElement('button');
@@ -54,6 +54,14 @@ async function loadEvents() {
     }
 }
 
+async function prepareParticipantText(participants, nombreParticipants) {
+    if (participants.includes("UsIflgeZTlY14aHVx6uN")) { // ID du profil "convive"
+        return `Convives(${nombreParticipants})`;
+    } else {
+        const participantNames = await Promise.all(participants.map(userId => getUserName(userId)));
+        return participantNames.join(', ');
+    }
+}
 
 // Chargez les événements lors du chargement de la page
 window.onload = () => {

@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Masquez l'écran de chargement après 1 seconde
     setTimeout(function() {
       document.getElementById('loadingScreen').style.display = 'none';
-    }, 1500);
+    }, 1800);
   });
   
 

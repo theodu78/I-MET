@@ -24,7 +24,7 @@
     </div>
 
     <!-- Bouton déplacé au-dessus du calendrier -->
-    <button id="declarerSejour">Déclarer un Séjour</button>
+    <button id="declarerSejour">Nouveau Séjour</button>
     <button id="retourMois" style="display: none;">Retour Mois</button>
     <div id="calendar"></div>
     
@@ -57,9 +57,11 @@
                 <label for="participants">Participants:</label>
                 <div id="selectedParticipantsList"></div>
                 
-                <button type="button" onclick="window.sauvegarderPresence()">Valider</button>
-                <button type="button" class="btn-annuler" onclick="window.fermerModal()">Annuler</button>
-                <button type="button" id="btnSupprimer" style="display:none;" onclick="window.supprimerEvenement()">Supprimer</button>
+                <div class="modal-buttons">
+                    <button id="btnValider" type="button" class="modal-button" onclick="window.sauvegarderPresence()">Valider</button>
+                    <button id="btnAnnuler" type="button" class="modal-button btn-annuler" onclick="window.fermerModal()">Annuler</button>
+                    <button id="btnSupprimer" type="button" class="modal-button" style="display:none;" onclick="window.supprimerEvenement()">Supprimer</button>
+                </div>
             </form>
             <div id="listeEvenements"></div>
         </div>
