@@ -11,27 +11,31 @@ function calculateAmount(event) {
     const start = new Date(event.dateDebut);
     const end = new Date(event.dateFin);
     let amount = 0;
+    const userId = sessionStorage.getItem('userId');
 
-    while (start < end) {
-        const hour = start.getHours();
-        if (hour >= 10 && hour < 18) {
-            // Tarif de journée de 10h00 à 17h59
-            amount += 5;
-            start.setHours(18, 0, 0, 0); // Avancer à 18h00
-        } else if (hour >= 18 && hour < 23) {
-            // Tarif du dîner de 18h00 à 22h29
-            amount += 0;
-            start.setHours(23, 0, 0, 0); // Avancer à 23h00
-        } else {
-            // Tarif de nuit de 22h30 à 9h59
-            amount += 3;
-            // Avancer au prochain jour à 10h00
-            start.setDate(start.getDate() + 1);
-            start.setHours(10, 0, 0, 0);
+    // Vérifiez si l'utilisateur est 'convive'
+    if (userId === "UsIflgeZTlY14aHVx6uN") {
+        let totalDays = Math.ceil((end - start) / (1000 * 3600 * 24)); // Calculer le nombre total de jours
+        let nombreConvives = event.nombreParticipants; // Assurez-vous que le nombre de convives est correctement stocké dans 'event'
+        amount = 8 * totalDays * nombreConvives; // 8€ par jour par convive
+    } else {
+        while (start < end) {
+            const hour = start.getHours();
+            if (hour >= 10 && hour < 18) {
+                amount += 5;
+                start.setHours(18, 0, 0, 0);
+            } else if (hour >= 18 && hour < 23) {
+                amount += 0; // Ajustez ici si le dîner a un coût
+                start.setHours(23, 0, 0, 0);
+            } else {
+                amount += 3;
+                start.setDate(start.getDate() + 1);
+                start.setHours(10, 0, 0, 0);
+            }
         }
     }
 
-    return amount;
+    return amount;d
 }
 
 // Fonction pour charger les informations de l'utilisateur
@@ -80,11 +84,11 @@ async function loadLastFourStays(userId) {
     });
 
 
-    let indicePQ = totalHours > 0 ? 50 * Math.log(totalHours * 1.8) - 185 : 10;
+    let indicePQ = totalHours > 0 ? 50 * Math.log(totalHours * 1.8) - 180 : 10;
 
     // Créer et afficher l'élément pour l'Indice PQ
     const pqElement = document.createElement('p');
-    pqElement.textContent = `Indice PQ : ${(totalHours > 0 ? 50 * Math.log(totalHours * 1.8) - 185 : 10).toFixed(2)} m`;
+    pqElement.textContent = `Indice PQ : ${(totalHours > 0 ? 50 * Math.log(totalHours * 1.8) - 180 : 10).toFixed(2)} m`;
     document.body.appendChild(pqElement);
 
     // Appeler la fonction displayCotisations à la fin
@@ -92,24 +96,38 @@ async function loadLastFourStays(userId) {
 }
 
 // Fonction pour calculer et afficher les informations de cotisation
+// Fonction pour calculer et afficher les informations de cotisation
 async function displayCotisations() {
     const year = new Date().getFullYear(); // Récupérer l'année en cours
     let cotisationAnnee = 0;
     let cotisationGlobale = 0;
+    let cotisationConvives = 0;
 
     const eventsCol = collection(db, 'Events');
     const eventSnapshot = await getDocs(eventsCol);
     
     eventSnapshot.forEach(doc => {
         const event = doc.data();
-        const montant = calculateAmount(event);
         const dateDebut = new Date(event.dateDebut);
 
-        cotisationGlobale += montant;
-        if (dateDebut.getFullYear() === year) {
-            cotisationAnnee += montant;
+        // Vérifiez si l'événement concerne le profil "convive"
+        if (event.participants.includes("UsIflgeZTlY14aHVx6uN")) {
+            // Calcul spécifique pour les événements "convive"
+            let montantConvive = calculateAmount(event);
+            cotisationConvives += montantConvive;
+        } else {
+            // Calcul normal pour les autres profils
+            let montant = calculateAmount(event);
+            cotisationGlobale += montant;
+            if (dateDebut.getFullYear() === year) {
+                cotisationAnnee += montant;
+            }
         }
     });
+
+    // Additionner les cotisations des événements "convive"
+    cotisationGlobale += cotisationConvives;
+    cotisationAnnee += cotisationConvives;
 
     // Création et affichage des informations de cotisation
     const cotisationInfo = document.createElement('div');
