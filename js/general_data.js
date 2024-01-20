@@ -95,60 +95,34 @@ async function loadLastFourStays(userId) {
     await displayCotisations();
 }
 
-// Fonction pour calculer et afficher les informations de cotisation
-// Fonction pour calculer et afficher les informations de cotisation
+// Fonction pour calculer et afficher les cotisations
 async function displayCotisations() {
-    const year = new Date().getFullYear(); // Récupérer l'année en cours
+    const year = new Date().getFullYear();
     let cotisationAnnee = 0;
     let cotisationGlobale = 0;
-    let cotisationConvives = 0;
-
     const eventsCol = collection(db, 'Events');
     const eventSnapshot = await getDocs(eventsCol);
-    
     eventSnapshot.forEach(doc => {
         const event = doc.data();
-        const dateDebut = new Date(event.dateDebut);
-
-        // Vérifiez si l'événement concerne le profil "convive"
-        if (event.participants.includes("UsIflgeZTlY14aHVx6uN")) {
-            // Calcul spécifique pour les événements "convive"
-            let montantConvive = calculateAmount(event);
-            cotisationConvives += montantConvive;
-        } else {
-            // Calcul normal pour les autres profils
-            let montant = calculateAmount(event);
-            cotisationGlobale += montant;
-            if (dateDebut.getFullYear() === year) {
-                cotisationAnnee += montant;
-            }
+        const montant = calculateAmount(event) * event.nombreParticipants;
+        cotisationGlobale += montant;
+        if (new Date(event.dateDebut).getFullYear() === year) {
+            cotisationAnnee += montant;
         }
     });
-
-    // Additionner les cotisations des événements "convive"
-    cotisationGlobale += cotisationConvives;
-    cotisationAnnee += cotisationConvives;
-
-    // Création et affichage des informations de cotisation
     const cotisationInfo = document.createElement('div');
-    cotisationInfo.innerHTML = `
-        <h3>Général :</h3>
-        <p>Cotisation (${year}) : ${cotisationAnnee.toFixed(2)} €</p>
-        <p>Cotisation globale : ${cotisationGlobale.toFixed(2)} €</p>
-    `;
+    cotisationInfo.innerHTML = `<h3>Général :</h3><p>Cotisation (${year}) : ${cotisationAnnee.toFixed(2)} €</p><p>Cotisation globale : ${cotisationGlobale.toFixed(2)} €</p>`;
     document.body.appendChild(cotisationInfo);
 }
 
-
 function init() {
-    // Récupération de l'ID de l'utilisateur depuis sessionStorage
     const userId = sessionStorage.getItem('userId');
     if (userId) {
-        // Chargement des informations de l'utilisateur et des séjours
         loadLastFourStays(userId);
     } else {
         console.log('ID utilisateur non trouvé dans sessionStorage');
     }
+}
 
     // Affichage du nom de l'utilisateur
     const userName = sessionStorage.getItem('userName');
@@ -165,8 +139,6 @@ function init() {
         
 
     }
-
-}
 
 async function fetchUserName(userId) {
     if (!userId) return;
@@ -195,9 +167,6 @@ window.onload = async function() {
 
     // Reste du code...
 };
-
-
-
 
 // Lancer l'initialisation une fois que le DOM est chargé
 document.addEventListener('DOMContentLoaded', init);

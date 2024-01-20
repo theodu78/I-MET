@@ -243,7 +243,7 @@ async function chargerListeParticipants(selectedParticipantIds = []) {
     try {
         const usersCol = collection(db, 'Users');
         const userSnapshot = await getDocs(usersCol);
-        let userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(user => user.actif);
+        let userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(user => user.actif === 'true');
 
         // Trier les utilisateurs par nom pour une présentation cohérente
         userList.sort((a, b) => a.Name.localeCompare(b.Name));
