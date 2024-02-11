@@ -11,32 +11,43 @@ function calculateAmount(event) {
     const start = new Date(event.dateDebut);
     const end = new Date(event.dateFin);
     let amount = 0;
-    const userId = sessionStorage.getItem('userId');
 
-    // Vérifiez si l'utilisateur est 'convive'
-    if (userId === "UsIflgeZTlY14aHVx6uN") {
-        let totalDays = Math.ceil((end - start) / (1000 * 3600 * 24)); // Calculer le nombre total de jours
-        let nombreConvives = event.nombreParticipants; // Assurez-vous que le nombre de convives est correctement stocké dans 'event'
-        amount = 8 * totalDays * nombreConvives; // 8€ par jour par convive
-    } else {
-        while (start < end) {
-            const hour = start.getHours();
-            if (hour >= 10 && hour < 18) {
-                amount += 5;
-                start.setHours(18, 0, 0, 0);
-            } else if (hour >= 18 && hour < 23) {
-                amount += 0; // Ajustez ici si le dîner a un coût
-                start.setHours(23, 0, 0, 0);
-            } else {
-                amount += 3;
-                start.setDate(start.getDate() + 1);
-                start.setHours(10, 0, 0, 0);
+    // Coûts unitaires par période
+    const costDay = 5; // Coût pour la journée (10h à 18h)
+    const costEvening = 0; // Coût pour la soirée (18h à 23h), ajustable si nécessaire
+    const costNight = 3; // Coût pour la nuit (23h à 10h)
+
+    // Détermine si l'utilisateur est un "convive"
+    const userId = sessionStorage.getItem('userId');
+    const isConvive = userId === "UsIflgeZTlY14aHVx6uN";
+    const nombreParticipants = isConvive ? event.nombreParticipants : 1; // Nombre de participants (1 si utilisateur standard)
+
+    // Calculer les périodes couvertes par l'événement
+    let current = new Date(start);
+    while (current < end) {
+        let hour = current.getHours();
+        if (hour >= 10 && hour < 18) {
+            amount += costDay; // Ajoute le coût de la journée
+            current.setHours(18); // Saute à la fin de la journée
+        } else if (hour >= 18 && hour < 23) {
+            amount += costEvening; // Ajoute le coût de la soirée
+            current.setHours(23); // Saute à la fin de la soirée
+        } else {
+            amount += costNight; // Ajoute le coût de la nuit
+            // Avance à la prochaine journée
+            if (hour >= 23) {
+                current.setDate(current.getDate() + 1); // Passe au jour suivant si après 23h
             }
+            current.setHours(10); // Début de la prochaine période de journée
         }
     }
 
-    return amount;d
+    // Multiplie le montant par le nombre de participants pour les "convives"
+    amount *= nombreParticipants;
+
+    return amount;
 }
+
 
 // Fonction pour charger les informations de l'utilisateur
 async function loadUserInfo(userId) {
@@ -95,6 +106,43 @@ async function loadLastFourStays(userId) {
     await displayCotisations();
 }
 
+function calculateAmountGlobal(event) {
+    const start = new Date(event.dateDebut);
+    const end = new Date(event.dateFin);
+    let amount = 0;
+
+    // Coûts unitaires par période
+    const costDay = 5; // Coût pour la journée (10h à 18h)
+    const costEvening = 0; // Coût pour la soirée (18h à 23h), ajustable si nécessaire
+    const costNight = 3; // Coût pour la nuit (23h à 10h)
+
+    // Calculer les périodes couvertes par l'événement
+    let current = new Date(start);
+    while (current < end) {
+        let hour = current.getHours();
+        if (hour >= 10 && hour < 18) {
+            amount += costDay; // Ajoute le coût de la journée
+            current.setHours(18); // Saute à la fin de la journée
+        } else if (hour >= 18 && hour < 23) {
+            amount += costEvening; // Ajoute le coût de la soirée
+            current.setHours(23); // Saute à la fin de la soirée
+        } else {
+            amount += costNight; // Ajoute le coût de la nuit
+            // Avance à la prochaine journée
+            if (hour >= 23) {
+                current.setDate(current.getDate() + 1); // Passe au jour suivant si après 23h
+            }
+            current.setHours(10); // Début de la prochaine période de journée
+        }
+    }
+
+    // Multiplie le montant par le nombre de participants pour tous les événements
+    amount *= event.nombreParticipants;
+
+    return amount;
+}
+
+
 // Fonction pour calculer et afficher les cotisations
 async function displayCotisations() {
     const year = new Date().getFullYear();
@@ -104,7 +152,8 @@ async function displayCotisations() {
     const eventSnapshot = await getDocs(eventsCol);
     eventSnapshot.forEach(doc => {
         const event = doc.data();
-        const montant = calculateAmount(event) * event.nombreParticipants;
+        // Utiliser calculateAmountGlobal pour le calcul
+        const montant = calculateAmountGlobal(event);
         cotisationGlobale += montant;
         if (new Date(event.dateDebut).getFullYear() === year) {
             cotisationAnnee += montant;
@@ -114,6 +163,7 @@ async function displayCotisations() {
     cotisationInfo.innerHTML = `<h3>Général :</h3><p>Cotisation (${year}) : ${cotisationAnnee.toFixed(2)} €</p><p>Cotisation globale : ${cotisationGlobale.toFixed(2)} €</p>`;
     document.body.appendChild(cotisationInfo);
 }
+
 
 function init() {
     const userId = sessionStorage.getItem('userId');
@@ -165,7 +215,6 @@ window.onload = async function() {
     const userName = await fetchUserName(userId);
     document.getElementById('userNameDisplay').textContent = userName;
 
-    // Reste du code...
 };
 
 // Lancer l'initialisation une fois que le DOM est chargé
