@@ -180,15 +180,29 @@ window.sauvegarderPresence = async function() {
     var participants = Array.from(document.querySelectorAll('#participantCheckboxes input[type=checkbox]:checked')).map(cb => cb.value);
     var participants = JSON.parse(document.getElementById('btnAjouterParticipants').dataset.currentParticipants || '[]');
 
-    var nombreConvives = parseInt(document.getElementById('btnAjouterParticipants').dataset.conviveCount || "0");
-    var nombreParticipants = participants.length;
-    
-    // Vérifier si "Convives" est dans la liste des participants et ajuster le nombre de participants
-    if (participants.includes('UsIflgeZTlY14aHVx6uN')) {
-        nombreParticipants--; // Soustraire 1 pour "Convives"
-    }
-    nombreParticipants += nombreConvives; // Ajouter le nombre réel de convives
 
+    var nombreConvives = 0; // Initialiser à 0
+    var nombreParticipants = participants.length;
+
+    // Si c'est un nouvel événement et que l'utilisateur connecté est "Convives"
+    if (!eventId && sessionStorage.getItem('userId') === 'UsIflgeZTlY14aHVx6uN') {
+        // Demander le nombre de convives
+        nombreConvives = parseInt(prompt("Combien de convives ?", "1") || "0", 10);
+        // Vérifier si "Convives" est inclus dans les participants et ajuster le nombre de participants
+        if (participants.includes('UsIflgeZTlY14aHVx6uN') && nombreConvives > 0) {
+            nombreParticipants += nombreConvives - 1; // Ajouter le nombre de convives et soustraire 1 pour "Convives"
+        } else {
+            nombreParticipants += nombreConvives;
+        }
+    } else {
+        // Si ce n'est pas un nouvel événement ou pas le profil "Convives", utiliser la logique existante
+        nombreConvives = parseInt(document.getElementById('btnAjouterParticipants').dataset.conviveCount || "0", 10);
+        if (participants.includes('UsIflgeZTlY14aHVx6uN') && nombreConvives > 0) {
+            nombreParticipants += nombreConvives - 1;
+        } else {
+            nombreParticipants += nombreConvives;
+        }
+    }
     var eventData = {
         dateDebut,
         dateFin,
