@@ -376,7 +376,7 @@ function getHeureDebut(repas) {
         case 'diner':
             return '18:00:00';
         case 'nuit':
-            return '21:00:00';
+            return '22:30:00';
         default:
             return '00:00:00';
     }
@@ -389,7 +389,7 @@ function getHeureFin(repas) {
         case 'dejeuner':
             return '14:00:00';
         case 'diner':
-            return '22:00:00';
+            return '21:00:00';
         default:
             return '23:59:59';
     }
