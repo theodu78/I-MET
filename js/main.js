@@ -157,6 +157,14 @@ async function chargerEvenementPourModification(event, eventData) {
     document.getElementById('selectedParticipantsList').innerHTML = '';
     document.getElementById('btnSupprimer').style.display = 'block';
 
+    // Déterminer le type de repas
+    const heureDebut = eventData.dateDebut.split('T')[1].substring(0, 5);
+    const heureFin = eventData.dateFin.split('T')[1].substring(0, 5);
+    const typeRepasDebut = determinerTypeRepas(heureDebut, heureFin); 
+    // Mettre à jour les sélecteurs de repas dans la modal
+    document.getElementById('repasDebut').value = typeRepasDebut;
+    document.getElementById('repasFin').value = typeRepasDebut;
+
     // Récupérer les participants existants pour cet événement
     const participantNames = await getParticipantNames(eventData.participants || []);
     const participantsList = document.getElementById('selectedParticipantsList');
@@ -166,6 +174,27 @@ async function chargerEvenementPourModification(event, eventData) {
 
     // Charger la liste des participants avec les cases pré-cochées pour les participants existants
     chargerListeParticipants(eventData.participants || []);
+}
+
+function determinerTypeRepas(heureDebut, heureFin) {
+    // Convertir les heures en minutes pour une comparaison plus facile
+    const convertirEnMinutes = (heure) => {
+        const [heures, minutes] = heure.split(':').map(Number);
+        return heures * 60 + minutes;
+    };
+
+    const debutMinutes = convertirEnMinutes(heureDebut);
+    const finMinutes = convertirEnMinutes(heureFin);
+
+    if (debutMinutes >= convertirEnMinutes('12:00') && finMinutes <= convertirEnMinutes('14:00')) {
+        return 'dejeuner';
+    } else if (debutMinutes >= convertirEnMinutes('18:00') && finMinutes <= convertirEnMinutes('21:00')) {
+        return 'diner';
+    } else if (debutMinutes >= convertirEnMinutes('22:30')) {
+        return 'nuit';
+    } else {
+        return 'petit-dejeuner'; // Utiliser comme valeur par défaut ou ajuster selon les besoins
+    }
 }
 
 // Fonctions pour gérer les événements Firebase
